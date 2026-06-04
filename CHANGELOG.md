@@ -1,5 +1,13 @@
 # Changelog
 
+
+## [1.0.3] - 2026-06-04
+
+- ✨ Confirmation dialog ("Domen va hesh kod to'g'ri kelyaptimi?") only
+  shows for in-app QR scans now. External deeplinks (e.g. opened via
+  `onOpenURL`) sign directly — the host already validated the payload.
+- 🔧 SDK binary updated (new checksum).
+
 ## [1.0.2] - 2026-06-04
 
 - 🔨 Fix: corrected source file paths in EimzoExample.xcodeproj — previous
