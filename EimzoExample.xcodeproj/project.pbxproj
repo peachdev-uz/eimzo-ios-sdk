@@ -3,92 +3,93 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F080F141189A674BDDC8418 /* EimzoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 930FE96CB7AB2AE8FFDF6805 /* EimzoSDK */; };
-		49EEA851DE8F1B5F21A57C63 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821AA61020F753F697186048 /* ContentView.swift */; };
-		8DDFECAC7CF3450E028CDEAC /* EimzoExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B0B11BBC3FE8DFB6C5E2AC /* EimzoExampleApp.swift */; };
-		F54D74D964C4897F003E9BFE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BADA83E1ED134FF4A7D254F /* Foundation.framework */; };
+		15B0442BE0E422A2FD11364D /* EimzoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = FB10B3F26F0EA5E02F5FA519 /* EimzoSDK */; };
+		47C44783963C2F491D8149A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 399967DBC0083A558D756802 /* Foundation.framework */; };
+		7D9542B0ABEB764994433EC1 /* EimzoExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD54E28202384643A909409 /* EimzoExampleApp.swift */; };
+		B5F7006436EDE9FBE75AA984 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFADC77BDB4DD4FD2634936B /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0BADA83E1ED134FF4A7D254F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		31B0B11BBC3FE8DFB6C5E2AC /* EimzoExampleApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EimzoExampleApp.swift; sourceTree = "<group>"; };
-		6CF60646DD3501BDDB5362D6 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		821AA61020F753F697186048 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		9A6330F09253BF92D7322A36 /* EimzoExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EimzoExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A4923B76E436A835D1015E16 /* EimzoExample.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = EimzoExample.entitlements; sourceTree = "<group>"; };
+		0CD54E28202384643A909409 /* EimzoExampleApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EimzoExampleApp.swift; sourceTree = "<group>"; };
+		399967DBC0083A558D756802 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		9092EFB6FFF2A5252D96679A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CFADC77BDB4DD4FD2634936B /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		EB048D4A1672288838FD6352 /* EimzoExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EimzoExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F8B9F49FBAD7CC425B38C55D /* EimzoExample.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = EimzoExample.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9C4F15B814706287BF2ADAD3 /* Frameworks */ = {
+		5EF539BC529833C2813CE065 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F54D74D964C4897F003E9BFE /* Foundation.framework in Frameworks */,
-				0F080F141189A674BDDC8418 /* EimzoSDK in Frameworks */,
+				47C44783963C2F491D8149A2 /* Foundation.framework in Frameworks */,
+				15B0442BE0E422A2FD11364D /* EimzoSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		28DF0F2A92480ADF9D17B34B /* EimzoExample */ = {
+		0028A7AC2130C57676891274 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				31B0B11BBC3FE8DFB6C5E2AC /* EimzoExampleApp.swift */,
-				821AA61020F753F697186048 /* ContentView.swift */,
-				6CF60646DD3501BDDB5362D6 /* Info.plist */,
-				A4923B76E436A835D1015E16 /* EimzoExample.entitlements */,
-			);
-			path = EimzoExample;
-			sourceTree = "<group>";
-		};
-		4F04DE67E5306DD390791784 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				0BADA83E1ED134FF4A7D254F /* Foundation.framework */,
+				399967DBC0083A558D756802 /* Foundation.framework */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		5FA28889D0A837840E7698B9 /* Products */ = {
+		32D0E80269F672B409EDAD61 /* EimzoExample */ = {
 			isa = PBXGroup;
 			children = (
-				9A6330F09253BF92D7322A36 /* EimzoExample.app */,
+				0CD54E28202384643A909409 /* EimzoExampleApp.swift */,
+				CFADC77BDB4DD4FD2634936B /* ContentView.swift */,
+				9092EFB6FFF2A5252D96679A /* Info.plist */,
+				F8B9F49FBAD7CC425B38C55D /* EimzoExample.entitlements */,
+			);
+			name = EimzoExample;
+			path = EimzoExample;
+			sourceTree = "<group>";
+		};
+		7AED61932CF7F4269833B0AB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0028A7AC2130C57676891274 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A49878197892129B37C0E1EF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EB048D4A1672288838FD6352 /* EimzoExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		946B3AEC985B58A75438386E = {
+		B37177B68F59E00E5482E9E9 = {
 			isa = PBXGroup;
 			children = (
-				5FA28889D0A837840E7698B9 /* Products */,
-				C1DD88255D06A6A928F1C3FF /* Frameworks */,
-				28DF0F2A92480ADF9D17B34B /* EimzoExample */,
+				A49878197892129B37C0E1EF /* Products */,
+				7AED61932CF7F4269833B0AB /* Frameworks */,
+				32D0E80269F672B409EDAD61 /* EimzoExample */,
 			);
-			sourceTree = "<group>";
-		};
-		C1DD88255D06A6A928F1C3FF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				4F04DE67E5306DD390791784 /* iOS */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		753CB2447072C1C7C59082AA /* EimzoExample */ = {
+		84212C8E5485AB6BD7A1BB33 /* EimzoExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 07094B62F94C8ED834AAEB9D /* Build configuration list for PBXNativeTarget "EimzoExample" */;
+			buildConfigurationList = 055BDB0ACBC57091607FB6C1 /* Build configuration list for PBXNativeTarget "EimzoExample" */;
 			buildPhases = (
-				07E3F0EC605FEB4A99421F07 /* Sources */,
-				9C4F15B814706287BF2ADAD3 /* Frameworks */,
-				036D56C20B3385C8A07CB3A3 /* Resources */,
+				45DAC56C8CCD3D389908C007 /* Sources */,
+				5EF539BC529833C2813CE065 /* Frameworks */,
+				0FDC8D791CA4161DC4097EB8 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -96,22 +97,22 @@
 			);
 			name = EimzoExample;
 			packageProductDependencies = (
-				930FE96CB7AB2AE8FFDF6805 /* EimzoSDK */,
+				FB10B3F26F0EA5E02F5FA519 /* EimzoSDK */,
 			);
 			productName = EimzoExample;
-			productReference = 9A6330F09253BF92D7322A36 /* EimzoExample.app */;
+			productReference = EB048D4A1672288838FD6352 /* EimzoExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		DDE70FDBE12BBFA199A5FED0 /* Project object */ = {
+		DCCD0ED56F24BB38ACAA1947 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = 7B5E1348745C024DF6F1997C /* Build configuration list for PBXProject "EimzoExample" */;
+			buildConfigurationList = A8A67AC4087FCFB97956D66C /* Build configuration list for PBXProject "EimzoExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -119,21 +120,21 @@
 				en,
 				Base,
 			);
-			mainGroup = 946B3AEC985B58A75438386E;
+			mainGroup = B37177B68F59E00E5482E9E9;
 			packageReferences = (
-				B0439A75D6B9359E0166BBA4 /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */,
+				5B6DD723C281D581178A11EA /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */,
 			);
-			productRefGroup = 5FA28889D0A837840E7698B9 /* Products */;
+			productRefGroup = A49878197892129B37C0E1EF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				753CB2447072C1C7C59082AA /* EimzoExample */,
+				84212C8E5485AB6BD7A1BB33 /* EimzoExample */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		036D56C20B3385C8A07CB3A3 /* Resources */ = {
+		0FDC8D791CA4161DC4097EB8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -143,73 +144,68 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		07E3F0EC605FEB4A99421F07 /* Sources */ = {
+		45DAC56C8CCD3D389908C007 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DDFECAC7CF3450E028CDEAC /* EimzoExampleApp.swift in Sources */,
-				49EEA851DE8F1B5F21A57C63 /* ContentView.swift in Sources */,
+				7D9542B0ABEB764994433EC1 /* EimzoExampleApp.swift in Sources */,
+				B5F7006436EDE9FBE75AA984 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		0D0BD5DB5C0C028FD0A3E050 /* Release */ = {
+		22EF2DB5D2483B5AF7185E21 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = EimzoExample/EimzoExample.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = EimzoExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.peachdev.eimzoexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		2652BB298705EF677ACFEFD4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = EimzoExample/EimzoExample.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = EimzoExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.peachdev.eimzoexample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		4975BC176EE6998E10B1A2B4 /* Debug */ = {
+		87F9464AB0EF0FF53E367EC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -270,78 +266,77 @@
 			};
 			name = Debug;
 		};
-		80B7F1CA98692A21C160FE21 /* Debug */ = {
+		BA3B3F3AAF110EEF7EFEBE2A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_ENTITLEMENTS = EimzoExample/EimzoExample.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CXZBCR43X2;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = EimzoExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = uz.peachdev.eimzoexample;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		835E505C15FA93AA3DD19CC8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_ENTITLEMENTS = EimzoExample/EimzoExample.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CXZBCR43X2;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = EimzoExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = uz.peachdev.eimzoexample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALIDATE_PRODUCT = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		07094B62F94C8ED834AAEB9D /* Build configuration list for PBXNativeTarget "EimzoExample" */ = {
+		055BDB0ACBC57091607FB6C1 /* Build configuration list for PBXNativeTarget "EimzoExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				835E505C15FA93AA3DD19CC8 /* Release */,
-				80B7F1CA98692A21C160FE21 /* Debug */,
+				2652BB298705EF677ACFEFD4 /* Release */,
+				22EF2DB5D2483B5AF7185E21 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B5E1348745C024DF6F1997C /* Build configuration list for PBXProject "EimzoExample" */ = {
+		A8A67AC4087FCFB97956D66C /* Build configuration list for PBXProject "EimzoExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4975BC176EE6998E10B1A2B4 /* Debug */,
-				0D0BD5DB5C0C028FD0A3E050 /* Release */,
+				87F9464AB0EF0FF53E367EC6 /* Debug */,
+				BA3B3F3AAF110EEF7EFEBE2A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -349,7 +344,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B0439A75D6B9359E0166BBA4 /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */ = {
+		5B6DD723C281D581178A11EA /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/peachdev-uz/eimzo-ios-sdk";
 			requirement = {
@@ -360,12 +355,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		930FE96CB7AB2AE8FFDF6805 /* EimzoSDK */ = {
+		FB10B3F26F0EA5E02F5FA519 /* EimzoSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B0439A75D6B9359E0166BBA4 /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */;
+			package = 5B6DD723C281D581178A11EA /* XCRemoteSwiftPackageReference "eimzo-ios-sdk" */;
 			productName = EimzoSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = DDE70FDBE12BBFA199A5FED0 /* Project object */;
+	rootObject = DCCD0ED56F24BB38ACAA1947 /* Project object */;
 }
