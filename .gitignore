@@ -1,0 +1,12 @@
+# Xcode per-user state — Xcode regenerates these on open
+**/xcuserdata/
+**/*.xcuserstate
+**/xcshareddata/IDETemplateMacros.plist
+
+# Swift Package Manager cache (per consumer)
+.build/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
