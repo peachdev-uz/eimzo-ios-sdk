@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>E-IMZO Demo</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>armv7</string>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+
+    <!-- E-IMZO SDK requirements -->
+
+    <!-- Camera — for QrScannerView (AVCaptureSession with .qr metadata). -->
+    <key>NSCameraUsageDescription</key>
+    <string>QR kalitlarni skanerlash uchun kamera kerak</string>
+
+    <!-- NFC — for NfcImporter (NFCTagReaderSession with the E-IMZO applet AID). -->
+    <key>NFCReaderUsageDescription</key>
+    <string>ID-karta orqali kalit o'qish uchun NFC kerak</string>
+    <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+    <array>
+        <!-- ASCII "eimzoapp" — same AID the Android applet uses. -->
+        <string>65696D7A6F617070</string>
+    </array>
+
+    <!-- Deeplink — receive 'eimzo://sign?qc=...' from other apps / scanners. -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>uz.peachdev.eimzoexample.signing</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>eimzo</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1] - 2026-06-04
+
+- 📦 Added a runnable `EimzoExample.xcodeproj` to the repo so integrators
+  can clone, open in Xcode, and hit ⌘R to see a working sign flow.
+- 📝 README now documents the example app + quick-start commands.
+
+No SDK source changes — the binary is identical to 1.0.0.
+
 ## [1.0.0] - 2026-06-04
 
 Initial release.
