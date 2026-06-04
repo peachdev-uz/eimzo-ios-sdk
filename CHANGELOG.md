@@ -1,33 +1,18 @@
 # Changelog
 
+## [1.0.4] - 2026-06-04
+
+- 🔐 **Security:** Keys.json now written with
+  `.completeFileProtectionUntilFirstUserAuthentication`. The file is
+  encrypted at rest with a passcode-derived key — `iMazing` / iTunes
+  backups, jailbroken-device filesystem reads, and `iCloud Drive` sync
+  only see opaque ciphertext.
 
 ## [1.0.3] - 2026-06-04
 
-- ✨ Confirmation dialog ("Domen va hesh kod to'g'ri kelyaptimi?") only
-  shows for in-app QR scans now. External deeplinks (e.g. opened via
-  `onOpenURL`) sign directly — the host already validated the payload.
-- 🔧 SDK binary updated (new checksum).
-
-## [1.0.2] - 2026-06-04
-
-- 🔨 Fix: corrected source file paths in EimzoExample.xcodeproj — previous
-  1.0.1 build had doubled `EimzoExample/EimzoExample/` paths that broke
-  Xcode compilation. SDK binary unchanged.
-
-## [1.0.1] - 2026-06-04
-
-- 📦 Added a runnable `EimzoExample.xcodeproj`. (Broken — see 1.0.2.)
-- 📝 README documents the example app + quick-start commands.
+- ✨ Confirmation dialog only shows for in-app QR scans now. External
+  deeplinks (e.g. `onOpenURL`) sign directly.
 
 ## [1.0.0] - 2026-06-04
 
-Initial release.
-
-- ✅ Closed-source XCFramework binary distribution via SPM
-- ✅ QR / PFX / NFC kalit qo'shish
-- ✅ OzDST 1092 / 1106 native Swift crypto (Android SDK bilan baytma-bayt mos)
-- ✅ Inline sign flow (Home page'da overlay'lar)
-- ✅ Domain + hash code tasdiqlash dialog
-- ✅ Saqlangan parol bilan auto-sign
-- ✅ Test rejimi toggle (`m.test.e-imzo.uz`)
-- 🔐 License enforcement: 5 ta checkpoint, 30 daqiqalik kesh
+Initial closed-source XCFramework release.

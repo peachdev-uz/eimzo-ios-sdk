@@ -150,19 +150,7 @@ EImzoView(
 
 ## Foydalanish misoli
 
-To'liq ishlaydigan namuna repo'da: [`EimzoExample.xcodeproj`](EimzoExample.xcodeproj) — Xcode'da oching, **Signing & Capabilities** ostida o'z Apple ID jamoangizni tanlang, **Cmd+R** bilan ishga tushiring.
-
-```bash
-git clone https://github.com/peachdev-uz/eimzo-ios-sdk
-cd eimzo-ios-sdk
-open EimzoExample.xcodeproj
-```
-
-Demo ilova quyidagini namoyish qiladi:
-- `EImzoView` ni sheet sifatida ochish
-- Test rejimi (`m.test.e-imzo.uz`) toggle
-- `eimzo://sign?qc=...` deeplink'larini `onOpenURL`'da ushlash
-- `onSignComplete` callback orqali natijani olish
+To'liq ishlaydigan namuna: [`Example/`](Example/) papkasida — Xcode'da ochib **Cmd+R** bilan ishga tushiring.
 
 ## Documentation
 
