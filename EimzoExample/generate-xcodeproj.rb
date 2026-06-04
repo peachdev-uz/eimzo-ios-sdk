@@ -48,16 +48,19 @@ target.build_configurations.each do |config|
 end
 
 # ── Sources ─────────────────────────────────────────────────────────────────
+# Group's `path` is "EimzoExample", so file refs are relative to that —
+# DON'T re-prefix the file names with "EimzoExample/" or you'll end up
+# with "EimzoExample/EimzoExample/Foo.swift" on disk.
 src_group = project.new_group('EimzoExample', 'EimzoExample')
 %w[EimzoExampleApp.swift ContentView.swift].each do |fname|
-  file_ref = src_group.new_file(File.join('EimzoExample', fname))
+  file_ref = src_group.new_file(fname)
   target.add_file_references([file_ref])
 end
 # Show Info.plist + entitlements in the Project Navigator. Both are wired up
 # via INFOPLIST_FILE / CODE_SIGN_ENTITLEMENTS — adding them here is purely
 # for navigation; they're not part of any build phase.
-src_group.new_file('EimzoExample/Info.plist')
-src_group.new_file('EimzoExample/EimzoExample.entitlements')
+src_group.new_file('Info.plist')
+src_group.new_file('EimzoExample.entitlements')
 
 # ── Swift Package Manager: depend on the published EimzoSDK binary ─────────
 # Pulls EimzoSDK.xcframework from this same repo's GitHub Releases. The

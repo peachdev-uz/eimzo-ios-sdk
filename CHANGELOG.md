@@ -1,12 +1,15 @@
 # Changelog
 
+## [1.0.2] - 2026-06-04
+
+- 🔨 Fix: corrected source file paths in EimzoExample.xcodeproj — previous
+  1.0.1 build had doubled `EimzoExample/EimzoExample/` paths that broke
+  Xcode compilation. SDK binary unchanged.
+
 ## [1.0.1] - 2026-06-04
 
-- 📦 Added a runnable `EimzoExample.xcodeproj` to the repo so integrators
-  can clone, open in Xcode, and hit ⌘R to see a working sign flow.
-- 📝 README now documents the example app + quick-start commands.
-
-No SDK source changes — the binary is identical to 1.0.0.
+- 📦 Added a runnable `EimzoExample.xcodeproj`. (Broken — see 1.0.2.)
+- 📝 README documents the example app + quick-start commands.
 
 ## [1.0.0] - 2026-06-04
 
