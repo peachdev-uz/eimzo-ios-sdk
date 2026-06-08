@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.2] - 2026-06-08
+
+### Fix: FeitianSDK module dependency leakage
+
+Integrator loyihalarida `Unable to resolve module dependency: 'FeitianSDK'`
+xatosi chiqayotgan edi. Static FeitianSDK.xcframework consumer-da alohida
+modul sifatida ko'rinmas, lekin swiftinterface uni qidirardi.
+
+Yechim: `@_implementationOnly import FeitianSDK` — swiftinterface'dan
+yashirildi. Runtime ishlash o'zgarmadi, Mach-O ichida symbol'lar
+xuddi avvalgidek mavjud.
+
+
 ## [1.1.1] - 2026-06-08
 
 ### Security: USB token API lockdown

@@ -23,9 +23,9 @@ let package = Package(
         .binaryTarget(
             name: "EimzoSDK",
             // Replace with the actual GitHub Release URL after `gh release create`:
-            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/1.1.1/EimzoSDK.xcframework.zip",
+            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/1.1.2/EimzoSDK.xcframework.zip",
             // Output of `swift package compute-checksum EimzoSDK.xcframework.zip`:
-            checksum: "5469550aa7b383d02d416e5f26477df1a8524f7952e09324c6f12dc8dd2c4c24"
+            checksum: "c77acf27f3661db639de8fb5d66eeaf867745d6ed2e7a750c364d9355fc8a44d"
         ),
     ]
 )
