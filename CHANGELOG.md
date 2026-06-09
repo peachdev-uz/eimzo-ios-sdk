@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.3] - 2026-06-08
+
+### Fix: HomeView'da orqaga qaytish tugmasi
+
+EImzoView sheet sifatida ochilganda foydalanuvchi HomeView'dan SDK'ni
+yopib chiqib keta olmas edi. Top-leading hamburger icon funksiyasiz edi —
+endi `chevron.backward` orqaga tugmasi bilan almashtirildi va
+`@Environment(\.dismiss)` orqali sheet'ni yopadi.
+
+
 ## [1.1.2] - 2026-06-08
 
 ### Fix: FeitianSDK module dependency leakage
