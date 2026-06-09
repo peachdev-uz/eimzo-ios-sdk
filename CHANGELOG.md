@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.1.4] - 2026-06-09
+
+### Feature: 103-soniyalik deeplink sessiyasi
+
+Deeplink orqali ochilgan imzo so'rovi endi **darhol** imzolanmaydi —
+SDK 103 soniyalik sessiya ochadi va foydalanuvchi shu vaqt davomida:
+
+- Yangi kalit qo'shishi (ID karta, PFX, QR yoki USB token),
+- yoki mavjud kalitni tanlashi,
+- **IMZOLASH** tugmasini bosib imzolashi mumkin.
+
+`HomeView` yuqorisida live countdown banner ko'rinadi (mm:ss + progress
+bar; 15 soniya qolganda qizilga o'tadi). Vaqt tugasa "Sessiya muddati
+tugadi" overlay chiqadi.
+
+**Sabab:** integratorlar deeplink kelishi bilan SDK avtomatik
+imzolashga o'tib ketardi — agar kalit hali yo'q bo'lsa foydalanuvchi
+nima imzolashini ko'ra olmasdan kalit qo'shishga majbur edi. Yangi
+oqim: deeplink → 103s window → kalit qo'shish (zarur bo'lsa) →
+IMZOLASH.
+
+**API o'zgarishi yo'q** — `EImzoView(deepLink:)` xuddi avvalgidek
+ishlatiladi.
+
+### XCFramework
+
+- **size:** 6.3 MB
+- **checksum (SHA-256):** `09f969174630f7f28a600e61bd0f592e564fdad3db7493ee8d4b4d69fc03ffe0`
+
 ## [1.1.3] - 2026-06-08
 
 ### Fix: HomeView'da orqaga qaytish tugmasi
