@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.1.5] - 2026-06-10
+
+### Fix: App Store nested framework rejection + dSYM
+
+1.1.4 va undan oldingi versiyalarda `Pfx2qr.framework` `EimzoSDK.framework/Frameworks/`
+ichiga embed qilingan edi. App Store Connect bunday tuzilmani qabul qilmaydi:
+
+```
+ITMS-90205  contains disallowed nested bundles
+ITMS-90206  contains disallowed file 'Frameworks'
+ITMS-90035  inner Pfx2qr Mach-O not properly signed
+```
+
+Va `dSYM` yo'qligi haqida warning chiqar edi.
+
+**Yechim — 1.1.5:**
+
+- `Pfx2qr.xcframework` endi alohida release artifact:
+  - `EimzoSDK.xcframework.zip` (17 MB)
+  - `Pfx2qr.xcframework.zip` (7.3 MB)
+- `Package.swift` ikkita `.binaryTarget` declare qiladi (`EimzoSDK` +
+  `Pfx2qr`), ikkalasi bir library product ichida — Xcode ularni
+  `App.app/Frameworks/` ostiga **yonma-yon** joylashtiradi.
+- `dSYM` fayllari `xcframework/<arch>/dSYMs/` ichida ship qilinadi.
+  App Store endi crash log'larni to'liq symbolicate qiladi.
+
+### Breaking change (consumer side)
+
+Integratorlar `pod install` / `swift package resolve` ni qaytadan
+ishga tushirishlari kerak — public API o'zgargani yo'q.
+
+### Checksums
+
+- **EimzoSDK:** `b7982b9fbcd3c9e9e7eddb85fbeaba1f5804d6056b500d7433ab6c4517611e6b`
+- **Pfx2qr:**  `1a0cde63c01b7d11c971d713cd3c106135f495731827b113049630ea7fa099bc`
+
 ## [1.1.4] - 2026-06-09
 
 ### Feature: 103-soniyalik deeplink sessiyasi
