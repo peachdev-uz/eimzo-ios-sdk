@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.1.6] - 2026-06-11
+
+### Feature: muddati tugagan sertifikat orqali imzolash bloklandi
+
+Muddati o'tgan (`validTo` sanasi kelib o'tgan) sertifikat bilan endi
+imzolab bo'lmaydi:
+
+- **KeyCard** — muddati tugagan kartochka kulrang ko'rinishga o'tadi,
+  qizil **"Muddati tugagan"** badge + qizil sana ko'rsatiladi.
+- **IMZOLASH tugmasi** o'chiriladi + "Bu sertifikat muddati tugagan.
+  Imzolash uchun yangi kalit qo'shing." matni chiqadi.
+- **SDK-core guard** — `EImzoSigner` license check'dan keyin
+  `isExpired()` tekshiradi va `SignError.certExpired` tashlaydi
+  (deeplink, QR, auto-sign — barcha yo'llar qamralgan).
+- Muddat tekshiruvi `validTo` sanasini real vaqt bilan (Asia/Tashkent)
+  solishtiradi — server'dan kelgan muzlatilgan `validNow` bayrog'iga
+  emas.
+
+### Improvement: kalitni bir bosishda tanlash
+
+Kalitlar ro'yxatida kartochka ustiga bir marta bosish endi uni darhol
+faol (default) kalit qilib tanlaydi va Home sahifasiga qaytaradi.
+Avvalgi "uzoq bosish → Default qilish" oqimi olib tashlandi. O'chirish
+hanuz context menu (uzoq bosish) orqali.
+
+### Checksums
+
+- **EimzoSDK:** `200ca39198ef8fa28e23c7e7eb19d27cbb08b4a739c5b03ae6a2337a4a94148e`
+- **Pfx2qr:**  `eb26550edc4c46158249f1240997458cc3390eef75cd54e8db0165491e15538f`
+
 ## [1.1.5] - 2026-06-10
 
 ### Fix: App Store nested framework rejection + dSYM
