@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.7] - 2026-06-29
+
+### Change: test API endpoint yangilandi
+
+Test rejimi endpointi `https://m.test.e-imzo.uz/api/rpc` dan
+`https://test.e-imzo.uz/api/rpc` ga o'zgartirildi (`m.` subdomeni
+olib tashlandi). `EImzoConfig.testApiUrl` default qiymati yangilandi;
+ilovangizda URL'ni qo'lda override qilayotgan bo'lsangiz, yangilang.
+Production endpointi (`m.e-imzo.uz`) o'zgarmadi.
+
 ## [1.1.6] - 2026-06-11
 
 ### Feature: muddati tugagan sertifikat orqali imzolash bloklandi

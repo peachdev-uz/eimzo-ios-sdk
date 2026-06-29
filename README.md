@@ -131,7 +131,7 @@ QA stenddagi imzolashlar uchun:
 
 ```swift
 EImzoView(
-    config: EImzoConfig(isTestMode: true),  // m.test.e-imzo.uz
+    config: EImzoConfig(isTestMode: true),  // test.e-imzo.uz
     deepLink: deepLink,
     onSignComplete: { _ in }
 )

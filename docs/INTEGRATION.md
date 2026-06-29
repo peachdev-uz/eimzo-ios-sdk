@@ -118,7 +118,7 @@ sign flow'ga kiradi (`EImzoView(deepLink:)` orqali).
 
 ## 6. Test rejimi
 
-`m.test.e-imzo.uz` (QA stand) bilan ishlash uchun:
+`test.e-imzo.uz` (QA stand) bilan ishlash uchun:
 
 ```swift
 EImzoView(
