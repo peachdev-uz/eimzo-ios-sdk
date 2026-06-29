@@ -9,7 +9,7 @@ struct ContentView: View {
     @State private var showEimzo = false
     @State private var presentedLink: String?
     /// Mirror of the SDK's `isTestMode` — flips the API endpoint between
-    /// `m.e-imzo.uz` (prod) and `m.test.e-imzo.uz` (QA). Scanned/incoming
+    /// `m.e-imzo.uz` (prod) and `test.e-imzo.uz` (QA). Scanned/incoming
     /// QRs only work against the same environment they were generated for,
     /// so keep this aligned with whatever issued the QR.
     @State private var isTestMode = false
@@ -35,7 +35,7 @@ struct ContentView: View {
                         Text("Test rejimi")
                             .font(.subheadline.weight(.semibold))
                         Text(isTestMode
-                             ? "m.test.e-imzo.uz"
+                             ? "test.e-imzo.uz"
                              : "m.e-imzo.uz")
                             .font(.caption)
                             .foregroundStyle(.secondary)

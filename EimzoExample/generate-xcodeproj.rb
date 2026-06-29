@@ -27,7 +27,7 @@ SDK_MIN_VERSION = '1.0.0'
 # Example app's own version. Bump this in lockstep with the SDK on every
 # release so the displayed CFBundleShortVersionString matches the tag a
 # consumer is looking at.
-EXAMPLE_VERSION = '1.0.3'
+EXAMPLE_VERSION = '1.1.7'
 
 FileUtils.rm_rf(PROJ_PATH)
 project = Xcodeproj::Project.new(PROJ_PATH)
