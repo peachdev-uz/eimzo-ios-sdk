@@ -28,13 +28,13 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "EimzoSDK",
-            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/1.1.7/EimzoSDK.xcframework.zip",
-            checksum: "d184b345b8c84ff89a9ce4905f2917dd6a5db54aebd4d18d717975df1377c5dd"
+            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/2.0.0/EimzoSDK.xcframework.zip",
+            checksum: "3d02887fda2a4a1ca57ddb1498d317d77672c08a03714df99b9575aa79635339"
         ),
         .binaryTarget(
             name: "Pfx2qr",
-            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/1.1.7/Pfx2qr.xcframework.zip",
-            checksum: "aac527d42833c82edec08eeadb452b9ea92c95c3e38d76fe3116268034103483"
+            url: "https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/2.0.0/Pfx2qr.xcframework.zip",
+            checksum: "e82aa153db806f7fd32807dcf48252e9e810643f77474b3fb855de6b18cea8af"
         ),
     ]
 )

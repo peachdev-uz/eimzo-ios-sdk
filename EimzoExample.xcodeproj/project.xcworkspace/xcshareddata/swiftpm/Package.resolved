@@ -1,0 +1,15 @@
+{
+  "originHash" : "f32e75d9ea08a73d20f3f1a1403298c987d5b29648445dac8f91d42132e831d5",
+  "pins" : [
+    {
+      "identity" : "eimzo-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/peachdev-uz/eimzo-ios-sdk",
+      "state" : {
+        "revision" : "b28d5cb5348fced2b6bf38990b6af5e5f491c842",
+        "version" : "1.1.7"
+      }
+    }
+  ],
+  "version" : 3
+}

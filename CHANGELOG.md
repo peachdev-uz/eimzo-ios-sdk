@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.0.0 — 2026-08-25
+
+**BREAKING: a licence is now required.**
+
+The Firestore registration check is gone. The SDK verifies a signed offline
+licence and nothing else — an app without one is refused, with no fallback.
+
+Already-shipped apps are unaffected; they keep running on the SDK version they
+were built with. The change bites when you upgrade.
+
+### Migration
+
+1. Email `info@yt.uz` with your Team ID:
+   `codesign -dvvv MyApp.app 2>&1 | grep TeamIdentifier`
+2. Add the returned file to your app bundle as `eimzo-license.txt`, or pass
+   its text via `EImzoConfig(license:)`.
+3. Update to 2.0.0.
+
+The licence binds your bundle id **and** your team identifier, so it does not
+work in another app.
+
+### Also
+
+- New design system: dark mode, uz/ru/en, Montserrat, selectable wallpapers,
+  11 reworked screens.
+- Live USB-token detection; the token can now be saved as a key.
+- The settings screen reports the SDK's version rather than the host app's.
+- The in-app "request access" form is gone — `info@yt.uz` instead.
+
 ## [1.1.7] - 2026-06-29
 
 ### Change: test API endpoint yangilandi
