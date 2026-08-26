@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.1.0 — 2026-08-26
+
+**BREAKING, despite the minor version.** The public API is now just the
+UI entry point.
+
+A change like this normally takes a major bump. Minor was chosen because
+nothing outside the SDK calls these symbols — they were never documented.
+
+Three declarations remain public: `EImzoView`, `EImzoConfig` and `SignResult`.
+Everything else — `KeyStore`, `EImzoSigner`, `EImzoApiClient`, `PkiUtils`,
+`HexUtils`, `TokenSession`, `EImzoApplet`, the models — is internal. That is
+141 public declarations outside the UI reduced to three.
+
+None of it was ever documented; the README has always shown `EImzoView`. Now
+the binary interface says the same thing: only public symbols reach an
+xcframework's generated interface, so this is a real boundary rather than a
+convention.
+
+### Why
+
+The signing flow spans the licence check, the PIN prompt, the session
+deadline and the backend round-trip. Exposing its pieces let every integrator
+rebuild that sequence — and rebuild it wrong.
+
+### Migration
+
+If you present `EImzoView`, nothing changes:
+
+```swift
+EImzoView(deepLink: link, onSignComplete: { _ in showEimzo = false })
+```
+
+If you were calling the internals directly, write to `info@yt.uz` and we will
+work out what you need.
+
 ## 2.0.0 — 2026-08-25
 
 **BREAKING: a licence is now required.**
