@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.2 — 2026-08-27
+
+**Fix: `EImzoConfig` could be silently discarded.**
+
+`checkLicenseAndInit` overwrote the configured licence unconditionally. The
+SDK's own screens re-init with a default config on every presentation, and
+that config carries no licence — so a token passed at startup survived
+exactly until the UI opened, and the app was then told "Litsenziya topilmadi"
+with the licence sitting in the integrator's own config. It is now only
+written when one was given.
+
+**Better: "Litsenziya topilmadi" says what to do about it.**
+
+The usual cause is not a missing licence but a file that never reached the
+bundle: Xcode shows it in the navigator while leaving it out of *Copy Bundle
+Resources*, and the app looks identical either way. The message now reports
+what the bundle actually contains, and points at `EImzoConfig(license:)` as
+the other way in.
+
+Also: the settings screen was still reporting `Versiya 2.0.0`.
+
 ## 2.1.0 — 2026-08-26
 
 **BREAKING, despite the minor version.** The public API is now just the
