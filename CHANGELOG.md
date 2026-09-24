@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 — 2026-09-24
+
+**New: BAIK USB tokens.** A key can now be added from a BAIK token and used to sign.
+
 ## 2.1.2 — 2026-08-27
 
 **Fix: `EImzoConfig` could be silently discarded.**
