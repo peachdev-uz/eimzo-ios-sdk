@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0-dev.2 — 2026-10-29 (pre-release)
+
+In gateway mode the SDK reports its errors and crashes to the YT gateway.
+
 ## 2.3.0-dev.1 — 2026-10-29 (pre-release)
 
 A test build. Swift Package Manager does not resolve a pre-release unless
