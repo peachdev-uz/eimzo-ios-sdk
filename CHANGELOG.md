@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.3.0-dev.1 — 2026-10-29 (pre-release)
+
+A test build. Swift Package Manager does not resolve a pre-release unless
+you ask for it exactly (`exact: "2.3.0-dev.1"`); `from: "2.2.0"` stays on
+2.2.0.
+
+**New: an app without a licence signs through the YT gateway.** With no
+offline licence the SDK reaches E-IMZO through the gateway, which recognises
+registered apps by bundle id and Team ID (App Attest). An app with a licence
+works as before, straight to E-IMZO.
+
+**New `EImzoConfig` fields:** `testGatewayUrl` (test mode has no default
+gateway), `productionGatewayUrl` (overrides the built-in production address;
+usually not needed) and `debugLogging` (the SDK's steps to the console, never
+keys, PINs or signatures).
+
+**Signatures are counted by kind of key.** Each signature through the gateway
+carries how its key is held — PFX file, QR code, ID card, USB token or BAIK
+token — for YT's statistics. Only counts are kept, never what was signed or
+by whom.
+
+**Note:** the production gateway (`https://e-imzo.soliq.uz/mobile/gateway`)
+is not live yet. Until it is, a release build without a licence cannot sign;
+keep using a licence in production.
+
 ## 2.2.0 — 2026-09-24
 
 **New: BAIK USB tokens.** A key can now be added from a BAIK token and used to sign.
