@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0-dev.3 — 2026-10-30 (pre-release)
+
+The holder's name on ID cards and USB tokens reads correctly, a USB token
+no longer hangs on the next signature, and the SDK ships a privacy manifest.
+
 ## 2.3.0-dev.2 — 2026-10-29 (pre-release)
 
 In gateway mode the SDK reports its errors and crashes to the YT gateway.
