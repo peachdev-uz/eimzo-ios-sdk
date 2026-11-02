@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0-dev.4 — 2026-11-02 (pre-release)
+
+A USB token that stops answering no longer hangs a signature: after 20
+seconds it fails with `token_timeout`, which is reported to the gateway. An
+ID card that does not come within Core NFC's minute is now reported as
+`card_timeout`, the same code as on Android.
+
 ## 2.3.0-dev.3 — 2026-10-30 (pre-release)
 
 The holder's name on ID cards and USB tokens reads correctly, a USB token
