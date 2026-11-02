@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.3.0-dev.7 — 2026-11-02 (pre-release)
+
+The SDK's own screens now match the E-IMZO app. The public API is unchanged.
+
+- Every sign request, from a deep link or the scanner, opens the
+  confirmation screen first — domain, hash and key — and only its SIGN
+  button signs. Signing waits for the site check; a failed check says so
+  instead of showing the raw site id.
+- Errors read as plain sentences chosen by error code, in a banner at the
+  top; no exception, HTTP or gateway text reaches the screen. A banner stays
+  while the phone is offline.
+- A new password sheet and PIN keypad; adding a key by file, QR, ID card,
+  USB token or BAIK token from one list. A wrong PIN keeps the attempts
+  left, and a blocked ID card gets its own sheet.
+- An ID card or USB token other than the chosen key's is caught before its
+  PIN is sent.
+- The scanner, key card, key list, signed screen and blocked screen follow
+  the app's design, with Dynamic Type, enough contrast and VoiceOver labels.
+- The SDK's texts come in Uzbek, Russian and English, with the SDK's own
+  language setting; the host app's language is left alone. The tables ship
+  inside the framework (`uz.lproj`, `ru.lproj`, `en.lproj`).
+- The 103-second countdown on a deep-link request is gone: the server says
+  when a request has expired.
+- A gateway refusal in the middle of a session closes the SDK's sheets
+  before the blocked screen appears.
+
 ## 2.3.0-dev.6 — 2026-11-02 (pre-release)
 
 The gateway is no longer configured. `EImzoConfig` takes an `environment`:
