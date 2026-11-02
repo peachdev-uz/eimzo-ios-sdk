@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.0-dev.6 — 2026-11-02 (pre-release)
+
+The gateway is no longer configured. `EImzoConfig` takes an `environment`:
+`.prod`, the default, or `.dev`, YT's test environment on test.e-imzo.uz,
+where only test keys sign. The SDK knows where each environment is, for an
+app with a licence and for one without. `testGatewayUrl` and
+`productionGatewayUrl` are gone; `isTestMode` still works (`true` is `.dev`)
+and is deprecated.
+
 ## 2.3.0-dev.5 — 2026-11-02 (pre-release)
 
 The SDK's screens stay inside the safe area on a phone turned sideways and

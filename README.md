@@ -125,17 +125,22 @@ struct MyApp: App {
 }
 ```
 
-### Test rejimi
+### Muhit (`environment`)
 
-QA stenddagi imzolashlar uchun:
+`environment` SDK qaysi E-IMZO bilan ishlashini tanlaydi: `.prod` (sukut
+bo'yicha) — haqiqiy E-IMZO, `.dev` — YT test muhiti (test.e-imzo.uz), u yerda
+faqat test kalitlari imzolaydi. Boshqa hech narsa sozlanmaydi: SDK har bir
+muhitning manzillarini o'zi biladi.
 
 ```swift
 EImzoView(
-    config: EImzoConfig(isTestMode: true),  // test.e-imzo.uz
+    config: EImzoConfig(environment: .dev),  // test.e-imzo.uz
     deepLink: deepLink,
     onSignComplete: { _ in }
 )
 ```
+
+2.2 dagi `isTestMode` hali ishlaydi (`true` — `.dev`), lekin eskirgan.
 
 ## SDK qanday ishlaydi?
 

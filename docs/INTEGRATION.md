@@ -76,7 +76,7 @@ struct ContentView: View {
         Button("E-IMZO ochish") { showSdk = true }
             .sheet(isPresented: $showSdk) {
                 EImzoView(
-                    config: EImzoConfig(isTestMode: false),
+                    config: EImzoConfig(environment: .prod),
                     deepLink: incomingDeepLink,
                     onSignComplete: { result in
                         if result.isSuccess {
@@ -116,19 +116,26 @@ struct MyApp: App {
 ContentView'da `incomingDeepLink` o'zgarganda SDK sheet'ni avtomatik ochib,
 sign flow'ga kiradi (`EImzoView(deepLink:)` orqali).
 
-## 6. Test rejimi
+## 6. Muhit: prod yoki dev
 
-`test.e-imzo.uz` (QA stand) bilan ishlash uchun:
+YT test muhiti (`test.e-imzo.uz`) bilan ishlash uchun:
 
 ```swift
 EImzoView(
-    config: EImzoConfig(isTestMode: true),
+    config: EImzoConfig(environment: .dev),
     ...
 )
 ```
 
-Production deeplinklarini test rejimida sinab bo'lmaydi va aksincha — har
+`.prod` (sukut bo'yicha) — haqiqiy E-IMZO, `.dev` — test muhiti, u yerda faqat
+test kalitlari imzolaydi. Manzil berilmaydi: SDK har bir muhitning
+manzillarini o'zi biladi — litsenziyali ilova uchun ham, litsenziyasiz (YT
+gateway orqali ishlaydigan) ilova uchun ham.
+
+Production deeplinklarini test muhitida sinab bo'lmaydi va aksincha — har
 ikkala serverda doc DB alohida.
+
+2.2 dagi `isTestMode` hali ishlaydi (`true` — `.dev`), lekin eskirgan.
 
 ## 7. Callbacks
 
