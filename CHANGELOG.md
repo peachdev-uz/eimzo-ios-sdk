@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0-dev.8 — 2026-11-03 (pre-release)
+
+The app makes its sign requests itself: `EImzoSignLink.create(siteId:documentId:hash:)`
+builds the link for `EImzoView(deepLink:)`. Do not register the `eimzo://` URL
+scheme — it is the E-IMZO app's; the SDK logs a warning when it finds it.
+
 ## 2.3.0-dev.7 — 2026-11-02 (pre-release)
 
 The SDK's own screens now match the E-IMZO app. The public API is unchanged.

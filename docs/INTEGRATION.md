@@ -70,21 +70,22 @@ import EimzoSDK
 
 struct ContentView: View {
     @State private var showSdk = false
-    @Binding var incomingDeepLink: String?
+    /// Ilova ichida yasalgan imzo so'rovi (5-bo'lim) yoki nil — Home.
+    @State private var signLink: String?
 
     var body: some View {
         Button("E-IMZO ochish") { showSdk = true }
             .sheet(isPresented: $showSdk) {
                 EImzoView(
                     config: EImzoConfig(environment: .prod),
-                    deepLink: incomingDeepLink,
+                    deepLink: signLink,
                     onSignComplete: { result in
                         if result.isSuccess {
                             // result.signature — 128 char hex
                             // result.serialNumber — sertifikat seriya raqami
                         }
                         showSdk = false
-                        incomingDeepLink = nil
+                        signLink = nil
                     }
                 )
             }
@@ -92,29 +93,30 @@ struct ContentView: View {
 }
 ```
 
-## 5. Deeplink handling
+## 5. Imzo so'rovi — faqat ilova ichidan
 
-Boshqa ilova `eimzo://sign?qc=...` deeplink yuborganda:
+`eimzo://` sxemasi E-IMZO ilovasiniki. Ilovangiz uni ro'yxatdan o'tkazmaydi
+(`Info.plist`dagi `CFBundleURLTypes`ga qo'shmang, `onOpenURL` bilan
+ushlamang): aks holda istalgan sayt yoki ilova sizning SDK'ingizni imzo
+so'rovi bilan ochishi mumkin bo'lardi. SDK host `Info.plist`ida `eimzo`
+sxemasini topsa, logga ogohlantirish yozadi.
+
+So'rov ilova ichida yasaladi: hujjatning `siteId`, `documentId` va `hash`
+qiymatlari sizning backend'ingizdan keladi, havolani SDK yasaydi va CRC32 ni
+qo'shadi:
 
 ```swift
-@main
-struct MyApp: App {
-    @State var incomingDeepLink: String?
-    var body: some Scene {
-        WindowGroup {
-            ContentView(incomingDeepLink: $incomingDeepLink)
-                .onOpenURL { url in
-                    if url.scheme == "eimzo" {
-                        incomingDeepLink = url.absoluteString
-                    }
-                }
-        }
-    }
+do {
+    signLink = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
+    showSdk = true
+} catch {
+    // EImzoSignLink.Error: qiymat formati noto'g'ri (siteId 4, documentId
+    // 8–16, hash 64 hex belgi)
 }
 ```
 
-ContentView'da `incomingDeepLink` o'zgarganda SDK sheet'ni avtomatik ochib,
-sign flow'ga kiradi (`EImzoView(deepLink:)` orqali).
+`EImzoView(deepLink:)` so'rovni avval ko'rsatadi (domen, hesh, kalit) va
+foydalanuvchi IMZOLASH'ni bosgandagina imzolaydi.
 
 ## 6. Muhit: prod yoki dev
 

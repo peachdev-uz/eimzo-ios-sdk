@@ -104,26 +104,26 @@ struct ContentView: View {
 }
 ```
 
-### Deeplink orqali ochish
+### Imzo so'rovini ilova ichida yaratish
 
-Boshqa ilovadan kelgan `eimzo://sign?qc=...` deeplink'ini ushlab olib, SDK'ga uzating:
+Ilovangiz `eimzo://` havolalarini tashqaridan **qabul qilmaydi**: bu sxema
+E-IMZO ilovasiniki, uni `Info.plist`dagi `CFBundleURLTypes`ga qo'shmang (SDK
+uni topsa logga ogohlantirish yozadi). Hujjatning `siteId`, `documentId` va
+`hash` qiymatlarini o'z backend'ingizdan oling, havolani SDK yasaydi:
 
 ```swift
-@main
-struct MyApp: App {
-    @State private var incomingDeepLink: String?
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView(incomingDeepLink: $incomingDeepLink)
-                .onOpenURL { url in
-                    guard url.scheme == "eimzo" else { return }
-                    incomingDeepLink = url.absoluteString
-                }
-        }
-    }
-}
+let link = try EImzoSignLink.create(
+    siteId: siteId,          // 4 hex belgi
+    documentId: documentId,  // 8–16 hex belgi
+    hash: hash               // 64 hex belgi
+)
+deepLink = link
+showEimzo = true             // EImzoView(deepLink: deepLink, …)
 ```
+
+SDK avval so'rovni ko'rsatadi (domen, hesh, kalit), foydalanuvchi IMZOLASH'ni
+bosgandagina imzolaydi. Kalit hali bo'lmasa, birinchi kalit qo'shilishi bilan
+so'rov ochiladi.
 
 ### Muhit (`environment`)
 
@@ -147,7 +147,7 @@ EImzoView(
 1. **License check** — Bundle ID Firestore'da `allowed_integrators` collection'ida bormi tekshiriladi
 2. **Home page** — saqlangan kalitlar ro'yxati, IMZOLASH tugmasi
 3. **Cards page** — kalit qo'shish (PFX fayl / QR / NFC)
-4. **Sign flow** — deeplink kelganda yoki IMZOLASH bosilganda:
+4. **Sign flow** — ilova so'rov berganda (`deepLink`) yoki IMZOLASH bosilib QR skanerlanganda:
    - Domain + hash tasdiqlash dialog
    - Parol so'rash (saqlangan bo'lsa, avtomatik)
    - OzDST 1092 imzo + `pki.send_pkcs7`
