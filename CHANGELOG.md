@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.0-dev.5 — 2026-11-02 (pre-release)
+
+The SDK's screens stay inside the safe area on a phone turned sideways and
+with the keyboard up. The signed-return screen, the add-key sheet and the
+blocked screen scroll when they do not fit instead of running under the
+home indicator or off the screen, and the password prompt keeps its field
+and both buttons above the keyboard.
+
 ## 2.3.0-dev.4 — 2026-11-02 (pre-release)
 
 A USB token that stops answering no longer hangs a signature: after 20
