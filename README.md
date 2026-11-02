@@ -132,6 +132,11 @@ bo'yicha) — haqiqiy E-IMZO, `.dev` — YT test muhiti (test.e-imzo.uz), u yerd
 faqat test kalitlari imzolaydi. Boshqa hech narsa sozlanmaydi: SDK har bir
 muhitning manzillarini o'zi biladi.
 
+Kalit qaysi muhitda qo'shilganini eslab qoladi. Boshqa muhitda u ro'yxatda
+qoladi, lekin «Boshqa server» deb belgilanadi va u bilan imzolab bo'lmaydi.
+Muhit yozilmasdan oldin qo'shilgan kalitlarda belgi yo'q — ular ikkala muhitda
+ham ishlaydi.
+
 ```swift
 EImzoView(
     config: EImzoConfig(environment: .dev),  // test.e-imzo.uz

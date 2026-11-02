@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.0-dev.9 — 2026-11-03 (pre-release)
+
+- A key remembers the environment it was added in. In the other one it stays
+  in the list, marked «Boshqa server», and cannot sign. Keys added before
+  this version have no mark and sign in either.
+- ID card and USB token keys get their real expiry date and show the
+  holder's PINFL (JSHSHIR). Before, the date was misread (04.06.2028 became
+  "2026.20.28") and the PINFL was not read; re-add such a key to correct it.
+
 ## 2.3.0-dev.8 — 2026-11-03 (pre-release)
 
 The app makes its sign requests itself: `EImzoSignLink.create(siteId:documentId:hash:)`
