@@ -1,33 +1,42 @@
 # Manual installation
 
-SPM o'rniga `.xcframework`'ni Xcode'ga to'g'ridan-to'g'ri qo'shish.
+SPM o'rniga `.xcframework`'larni Xcode'ga to'g'ridan-to'g'ri qo'shish.
 
 ## 1. Yuklab olish
 
 [GitHub Releases](https://github.com/peachdev-uz/eimzo-ios-sdk/releases) →
-oxirgi versiyadan `EimzoSDK.xcframework.zip`'ni yuklang.
+`2.3.0` release'dan ikkala faylni yuklang: `EimzoSDK.xcframework.zip` va
+`Pfx2qr.xcframework.zip`.
 
 Yoki Terminal'da:
 ```bash
-curl -L -o EimzoSDK.xcframework.zip \
-  https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/1.0.0/EimzoSDK.xcframework.zip
+curl -L -O https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/2.3.0/EimzoSDK.xcframework.zip
+curl -L -O https://github.com/peachdev-uz/eimzo-ios-sdk/releases/download/2.3.0/Pfx2qr.xcframework.zip
+shasum -a 256 EimzoSDK.xcframework.zip Pfx2qr.xcframework.zip
 unzip EimzoSDK.xcframework.zip
+unzip Pfx2qr.xcframework.zip
 ```
+
+`shasum` natijasi `2.3.0` tegidagi [`Package.swift`](../Package.swift)dagi
+`checksum` qiymatlari bilan bir xil bo'lishi kerak.
 
 ## 2. Xcode'ga qo'shish
 
 1. Xcode'da loyihangizni oching.
 2. App target'ni tanlang.
 3. **General** → **Frameworks, Libraries, and Embedded Content** ostiga
-   `EimzoSDK.xcframework`'ni drag-and-drop qiling.
-4. **Embed** ustunini **Embed & Sign** ga o'rnating.
+   `EimzoSDK.xcframework` va `Pfx2qr.xcframework`'ni drag-and-drop qiling.
+4. **Embed** ustunida: `EimzoSDK.xcframework` — **Embed & Sign**,
+   `Pfx2qr.xcframework` — **Do Not Embed** (u statik kutubxona).
 
 ## 3. Foydalanish
 
-Endi qolgan qadamlar SPM holatidagi kabi — `import EimzoSDK` qilib
-`EImzoView` ni present qiling. [INTEGRATION.md](INTEGRATION.md) ga qarang.
+Endi qolgan qadamlar SPM holatidagi kabi: ilovani ro'yxatdan o'tkazing,
+`Info.plist` kalitlarini qo'shing, `import EimzoSDK` qilib `EImzoView`ni
+present qiling. [INTEGRATION.md](INTEGRATION.md) ga qarang.
 
 ## Yangilash
 
-Yangi versiya chiqsa, eski `EimzoSDK.xcframework`'ni Xcode'dan o'chirib,
-yangisini drag-and-drop qiling. Yoki Terminal'da o'zgartirib qoldiring.
+Yangi versiya chiqsa, eski ikkala `.xcframework`'ni Xcode'dan o'chirib,
+yangilarini xuddi shunday qo'shing. Nima o'zgarganini avval
+[CHANGELOG.md](../CHANGELOG.md)dan ko'ring.

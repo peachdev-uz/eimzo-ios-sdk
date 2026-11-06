@@ -1,5 +1,140 @@
 # Changelog
 
+## 2.3.0 — 2026-11-06
+
+**Read "Upgrading from 2.2" below before you update.** An app that is not
+registered with the YT gateway gets the SDK's blocked screen, and
+`from: "2.0.0"` or `from: "2.2.0"` resolves to 2.3.0 the next time packages
+are updated.
+
+The public API is `EImzoView`, `EImzoConfig` and `SignResult` as before,
+plus `EImzoSignLink` and `EImzoEnvironment`; `EImzoConfig` gains
+`environment` and `debugLogging`.
+
+**New: every app signs through the YT gateway.** E-IMZO is reached only
+through the gateway, which admits an app by App Attest: Apple vouches for its
+bundle id and Team ID. To register, email `info@yt.uz` with the bundle id and
+Team ID and say which environment: `dev` while you test, `prod` for release.
+The two are registered separately. No licence file is needed.
+
+App Attest needs a real iPhone or iPad; in the iOS Simulator the SDK shows
+its blocked screen. That screen says in one sentence whether the app or the
+device was refused, and keeps the technical reason, with the bundle id and a
+copy button, under «Ishlab chiquvchi uchun».
+
+**Apps that already ship a licence** (`EIMZO1.…`, from 2.0–2.2) open their
+gateway session with the licence instead of App Attest. The SDK still checks
+the licence on the device first, and the gateway must have it on record;
+otherwise the blocked screen (`licence_not_registered`). Write to
+`info@yt.uz` before you upgrade such an app, and keep 2.2 until YT confirms:
+`.upToNextMinor(from: "2.2.0")`. The SDK no longer downloads the revocation
+list (`revoked.txt` on GitLab Pages); the gateway refuses a revoked, expired
+or unknown licence.
+
+**Changed: `eimzo://` links are no longer taken from outside.** The scheme is
+the E-IMZO app's, and an app that claims it opens its SDK for any page or app
+that sends one. Take `eimzo` out of `CFBundleURLTypes` (the SDK logs a
+warning when it finds it there) and drop the `onOpenURL` handler. Make the
+request in the app from your backend's `siteId`, `documentId` and `hash`:
+`EImzoSignLink.create(siteId:documentId:hash:)` returns the link for
+`EImzoView(deepLink:)` and throws `EImzoSignLink.Error` on a malformed value.
+
+**Changed: `environment` replaces `isTestMode`.** `EImzoConfig(environment:)`
+takes `.prod`, the default — E-IMZO with real keys — or `.dev`, YT's test
+environment on test.e-imzo.uz, where only test keys sign. The SDK knows both
+environments' gateways; there is no address to configure. `isTestMode` still
+works (`true` is `.dev`) and is deprecated.
+
+**New: error and crash reports go to the YT gateway.** Always on, with no
+switch.
+
+- Sent: the action (adding a key, signing, scanning a QR, deleting a key), an
+  error code, the message the user was shown, the kind of key, the SDK and
+  iOS versions, the device model, and for a crash its stack.
+- Never sent: names, PINFL/STIR, certificate serials, passwords, PINs, QR
+  codes, documents or their hashes. They are scrubbed before a report leaves
+  the phone.
+- Only crashes that start in the SDK are reported, on the next start; the
+  app's own crash reporter still gets them.
+- In App Store Connect → App Privacy, declare **Crash Data** and **Other
+  Diagnostic Data**: not linked to the user, not used for tracking, purpose
+  App Functionality. The SDK ships a privacy manifest
+  (`PrivacyInfo.xcprivacy`).
+
+The gateway counts signatures per app and per kind of key — PFX file, QR
+code, ID card, USB token, BAIK token. It never keeps what was signed or by
+whom.
+
+**New: the SDK's screens match the E-IMZO app.**
+
+- Every sign request, made in the app or scanned, opens a confirmation
+  screen first — domain, hash and key — and only its SIGN button signs.
+  Signing waits for the site check.
+- Errors read as plain sentences in a banner at the top; no exception, HTTP
+  or gateway text reaches the screen.
+- A new password sheet and PIN keypad; adding a key by file, QR, ID card, USB
+  token or BAIK token from one list. A wrong PIN shows the attempts left, and
+  a blocked ID card has its own sheet.
+- Dynamic Type, enough contrast and VoiceOver labels. Screens stay inside the
+  safe area with the phone turned sideways and with the keyboard up.
+- The SDK's texts come in Uzbek, Russian and English, with the SDK's own
+  language setting; the host app's language is left alone.
+
+**Changed: after signing.** A request the app made ends on «Imzolandi» with
+one «Ilovaga qaytish» (Return to the app) button. It returns by itself after
+3 seconds and calls `onSignComplete`. «Saytga qaytish» and «Ilovada qolish»
+are gone; in 2.2, «Ilovada qolish» left the app without its `SignResult`. A
+request scanned from a QR code ends on «Tayyor», and the callback comes when
+it is tapped (in 2.2 it came by itself after 1.8 seconds). `onSignComplete`
+is called only with a signature E-IMZO accepted; errors stay on the SDK's
+screen.
+
+**Changed: requests and keys.**
+
+- With no key yet, a request waits on the home screen and opens as soon as
+  the first key is added. The 103-second countdown is gone: the server says
+  when a request has expired.
+- A key remembers the environment it was added in. In the other one it stays
+  in the list, marked «Boshqa server», and cannot sign. Keys added before 2.3
+  have no mark and sign in both.
+
+**Fixed: ID cards and USB tokens.**
+
+- The holder's name reads correctly, and the key shows its real expiry date
+  and the holder's PINFL (JSHSHIR). Before, the date was misread (04.06.2028
+  became "2026.20.28"), which also kept an expired key from being caught, and
+  the PINFL was not read. Such keys added before 2.3 keep the old values:
+  re-add them to correct.
+- A card or token other than the chosen key's is caught before its PIN is
+  sent.
+- An ID card that does not come within Core NFC's minute fails with
+  `card_timeout`. A USB token silent for 20 seconds fails with
+  `token_timeout`, and a token no longer hangs on the next signature.
+
+**New: `debugLogging`.** `EImzoConfig(debugLogging: true)` prints the SDK's
+steps to the console — never keys, passwords, PINs or signatures. Off by
+default; keep it off in release builds. Errors and warnings are printed
+either way.
+
+### Upgrading from 2.2
+
+1. Register the app: email `info@yt.uz` the bundle id and Team ID
+   (`codesign -dvvv MyApp.app 2>&1 | grep TeamIdentifier`) for `dev` and/or
+   `prod`. Until it is registered the SDK shows its blocked screen, so do
+   this before you test — on a real device.
+2. If the app ships a licence, write to `info@yt.uz` first and stay on 2.2
+   (`.upToNextMinor(from: "2.2.0")`) until YT confirms.
+3. Remove `eimzo` from `CFBundleURLTypes` and the `eimzo://` `onOpenURL`
+   handler; make sign requests with `EImzoSignLink.create`.
+4. Replace `EImzoConfig(isTestMode:)` with `EImzoConfig(environment:)`.
+5. Close the SDK's sheet in `onSignComplete`; it comes after «Ilovaga
+   qaytish» (or 3 seconds) or «Tayyor».
+6. Declare Crash Data and Other Diagnostic Data in App Privacy.
+7. Update the package: `from: "2.3.0"`.
+
+If you tried a 2.3.0-dev build: `testGatewayUrl` and `productionGatewayUrl`
+are gone — `environment` replaces both.
+
 ## 2.2.0 — 2026-09-24
 
 **New: BAIK USB tokens.** A key can now be added from a BAIK token and used to sign.
