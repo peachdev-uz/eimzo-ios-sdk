@@ -22,12 +22,14 @@ PROJ_PATH   = File.join(REPO_ROOT, 'EimzoExample.xcodeproj')
 
 SDK_PACKAGE_URL = 'https://github.com/peachdev-uz/eimzo-ios-sdk'
 # Minimum SDK version the example targets (used for `.upToNextMajorVersion`).
-# Stays at 1.0.0 — SPM auto-resolves to whatever the highest 1.x tag is.
-SDK_MIN_VERSION = '1.0.0'
+# 2.3.0: `EImzoSignLink`, `EImzoConfig(environment:)` and signing through the
+# YT gateway — nothing older has the API the example uses. SPM resolves to
+# the highest 2.x tag.
+SDK_MIN_VERSION = '2.3.0'
 # Example app's own version. Bump this in lockstep with the SDK on every
 # release so the displayed CFBundleShortVersionString matches the tag a
 # consumer is looking at.
-EXAMPLE_VERSION = '1.1.7'
+EXAMPLE_VERSION = '2.3.0'
 
 FileUtils.rm_rf(PROJ_PATH)
 project = Xcodeproj::Project.new(PROJ_PATH)

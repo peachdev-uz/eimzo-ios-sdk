@@ -248,7 +248,9 @@ bilan keladi.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample/` 1.x uchun yozilgan va 2.3 ga moslanmagan: u `eimzo://` sxemasini ro'yxatdan o'tkazadi va `isTestMode`ni ishlatadi. 2.3 uchun shu README va [INTEGRATION.md](docs/INTEGRATION.md)dagi koddan foydalaning.
+Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — 2.3 uchun SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.3.0"`). Ikkita tugma bor: SDK'ni so'rovsiz ochish va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan ochish. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
+
+Ishga tushirish: `EimzoExample.xcodeproj`ni oching, Signing & Capabilities'da Team'ingizni tanlang va bundle ID'ni o'zingiznikiga almashtiring. Shu bundle ID va Team ID ro'yxatdan o'tgan bo'lishi kerak (yuqoridagi «Ro'yxatdan o'tish»), aks holda SDK bloklangan ekranni ko'rsatadi. Ilovani haqiqiy iPhone'da sinang: iOS Simulator'da ham SDK bloklangan ekranni ko'rsatadi.
 
 ## Documentation
 
