@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.4.0 — 2026-11-09
+
+**New: the Keys API («Kalitlar API»), for integrators YT has given the
+permission.** YT turns it on at the integrator's request, after the contract,
+for all of its apps; without it both methods return `api_not_allowed`.
+`EImzoView` stays open to every registered integrator, and users keep adding
+their keys there.
+
+- `EImzoAPI.getKeys(config:)` returns the keys the user has added to the SDK
+  on this phone that can be used in the configured environment, as JSON:
+  `{"status":"ok","keys":[{"id":…,"pinfl":…,"name":…,"validFrom":"yyyy-MM-dd","validTo":"yyyy-MM-dd"}]}`.
+  Every kind of key, expired ones included, the default key first. Nothing
+  else about a key is returned — no STIR, organisation, key data or password.
+- `EImzoAPI.sign(keyId:deepLink:config:)` signs an `EImzoSignLink` request
+  with one of those keys through the SDK's own sign sheet, shown over your
+  top-most view controller. The sheet shows the site, the hash and the key;
+  the user taps IMZOLASH and types the password or PIN there and only there.
+  It returns `{"status":"signed"}`, `{"status":"cancelled"}` or
+  `{"status":"error","code":…,"message":…}`. One `sign` at a time.
+- How the sheet ends on an error, as on Android: at once, with no SDK
+  message, when the gateway or the licence refuses (`blocked`, its message
+  led by the gateway's code or `licence:`), the permission is withdrawn
+  (`api_not_allowed`) or E-IMZO does not know the request's site
+  (`invalid_request`); after the SDK has shown why and the user has dismissed
+  it for an expired key (`key_expired`), E-IMZO refusing the signature
+  (`sign_failed`, E-IMZO's words in `message`) or a blocked PIN
+  (`sign_failed`, `pin_blocked`). Anything else stays in the sheet, and
+  closing it then is `cancelled`.
+- The PKCS#7 still goes from E-IMZO to your backend, never to the app.
+- Error codes: `api_not_allowed`, `blocked`, `network`, `invalid_request`,
+  `key_not_found`, `key_expired`, `busy`, `sign_failed` — the same on Android
+  and in the Flutter plugin. The README's «Kalitlar API» section and
+  INTEGRATION.md §11 have the details.
+
+**Changed: the xcframework ships without dSYMs.** From 1.1.5 to 2.3 the
+zip carried them. When you upload your app, Xcode may now say that the
+archive has no dSYM for `EimzoSDK.framework`: that is expected, and the
+upload goes through. Crashes that start in the SDK reach YT through its own
+crash reports, and YT symbolicates them.
+
 ## 2.3.0 — 2026-11-06
 
 **Read "Upgrading from 2.2" below before you update.** An app that is not

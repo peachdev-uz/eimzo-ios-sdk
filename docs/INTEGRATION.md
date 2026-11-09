@@ -57,13 +57,13 @@ Xcode → File → Add Package Dependencies → URL:
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Version rule: **Up to Next Major Version** dan **2.3.0**. Product:
+Version rule: **Up to Next Major Version** dan **2.4.0**. Product:
 `EimzoSDK`.
 
 `Package.swift`da:
 
 ```swift
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.3.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0")
 // target'da:
 .product(name: "EimzoSDK", package: "eimzo-ios-sdk")
 ```
@@ -262,8 +262,159 @@ narsa bo'lsa, shu yerda yoziladi. Bu minor versiyada ham bo'lishi mumkin:
 2.3.0 dan ilova ro'yxatdan o'tgan bo'lishi kerak.
 
 ```
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.3.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0")
 ```
 
-`from: "2.3.0"` semantic versioning bo'yicha 2.3.0 va undan yangi 2.x
+`from: "2.4.0"` semantic versioning bo'yicha 2.4.0 va undan yangi 2.x
 versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
+
+## 11. Kalitlar API
+
+2.4.0 dan SDK'da `EImzoView`dan tashqari ikkita usul bor:
+
+- `EImzoAPI.getKeys(config:)` — foydalanuvchi telefonda SDK'ga qo'shgan
+  kalitlar ro'yxati;
+- `EImzoAPI.sign(keyId:deepLink:config:)` — shu kalitlardan biri bilan imzo,
+  SDK'ning o'z imzo oynasi orqali.
+
+Ikkalasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
+marta. Usul nomlari, JSON shakli va xato kodlari Android SDK va Flutter
+plaginida ham shunday.
+
+### Ruxsat
+
+Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi. Ruxsatni
+`info@yt.uz` orqali so'rang: u shartnoma tuzilgandan keyin beriladi va
+integratorning barcha ilovalariga tegishli. Ilova avvalgidek ro'yxatdan
+o'tgan bo'lishi kerak (1-bo'lim). Ruxsat bo'lmasa, ikkala usul
+`api_not_allowed` xatosini qaytaradi; ruxsat o'chirilsa, ochiq `sign` ham shu
+xato bilan tugaydi.
+
+`EImzoView` avvalgidek ro'yxatdan o'tgan har bir integratorga ochiq.
+Foydalanuvchi kalitlarini o'sha yerda qo'shadi (PFX fayl, QR, ID karta, USB
+token, BAIK token): API kalit qo'shmaydi.
+
+Tekshiruv uchun alohida init yo'q: har bir usul litsenziya va gateway
+tekshiruvini kerak bo'lganda o'zi bajaradi. API bloklangan ekranni
+ko'rsatmaydi — rad etish `blocked` xatosi bo'lib qaytadi. App Attest faqat
+haqiqiy qurilmada ishlaydi, shuning uchun API'ni ham qurilmada sinang.
+
+### Kalitlar ro'yxati
+
+```swift
+let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
+```
+
+```json
+{"status":"ok","keys":[
+  {"id":"7a3f…","pinfl":"31234567890123","name":"ALIYEV VALI ALIYEVICH",
+   "validFrom":"2025-03-01","validTo":"2027-03-01"}
+]}
+```
+
+- `id` — sertifikat seriya raqami, SDK saqlaganidek. Uni o'zgartirmasdan
+  `sign`ga bering.
+- `pinfl` — JSHSHIR; sertifikatda bo'lmasa `null`.
+- `name` — sertifikat egasining ismi.
+- `validFrom`, `validTo` — `yyyy-MM-dd` (soatsiz); SDK sanani o'qiy olmasa
+  `null`.
+
+Ro'yxatda tanlangan muhitda (`environment`, 6-bo'lim) ishlatsa bo'ladigan
+barcha turdagi kalitlar bor. Muddati o'tganlari ham kiradi — ularni
+`validTo` bo'yicha «muddati o'tgan» deb ko'rsating. Boshqa muhitda
+qo'shilgan kalit kirmaydi. Tartib SDK'ning o'z ro'yxatidagidek: asosiy kalit
+birinchi. Kalit bo'lmasa — `{"status":"ok","keys":[]}`.
+
+STIR, tashkilot, kalit turi, parol va kalitning o'zi qaytarilmaydi.
+
+### Imzo
+
+So'rov havolasi avvalgidek ilova ichida yasaladi (5-bo'lim):
+
+```swift
+let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
+let json = await EImzoAPI.sign(keyId: key.id, deepLink: link, config: config)
+```
+
+`sign` avval tekshiradi, shu tartibda, va birinchi o'tmagan tekshiruv
+xatosini hech narsa ochmasdan qaytaradi: ruxsat, so'rov (`invalid_request`),
+kalit shu telefonda va shu muhitda bormi (`key_not_found`), muddati
+(`key_expired`), boshqa `sign` ochiq emasmi (`busy`).
+
+Keyin SDK imzo oynasini ilovaning eng ustki ekrani ustida (key window'ning
+eng ustki view controller'i, sheet) ochadi. Oynada sayt (domen), hesh va
+siz tanlagan kalit; boshqa kalitga almashtirib bo'lmaydi. Foydalanuvchi
+IMZOLASH'ni bosadi va faqat shu oynada parolni (PFX yoki QR kalit; saqlangan
+parol avvalgidek ishlatiladi) yoki PIN'ni (ID karta — kartani tutadi; USB
+yoki BAIK token — token ulangan bo'ladi) kiritadi. Imzodan keyin
+«Imzolandi» ekrani 3 soniyadan keyin o'zi yopiladi, shundan keyin `sign`
+qaytadi.
+
+- `{"status":"signed"}` — E-IMZO imzoni qabul qildi.
+- `{"status":"cancelled"}` — foydalanuvchi oynani imzolamasdan yopdi. Oyna
+  ko'rsatgan, foydalanuvchi tuzatsa bo'ladigan xatodan keyin yopilsa ham
+  shunday: noto'g'ri parol yoki PIN (urinish qolgan bo'lsa), karta yoki token
+  yo'q yoki boshqasi, internet yo'q, javob kelmadi.
+- `{"status":"error","code":"…","message":"…"}` — tekshiruv o'tmadi yoki
+  oqim xato bilan tugadi:
+  - oyna darhol, SDK xabarisiz yopiladi: gateway yoki litsenziya rad etdi
+    (`blocked`), ruxsat o'chirildi (`api_not_allowed`), E-IMZO so'rovning
+    saytini ro'yxatdan o'tmagan dedi (`invalid_request`);
+  - SDK avval sababini oynada ko'rsatadi (`EImzoView`dagidek), foydalanuvchi
+    uni yopgach (yoki oynani yopsa) xato qaytadi: kalit muddati tugagan
+    (`key_expired`), E-IMZO imzoni rad etdi — hujjat muddati o'tgan yoki
+    topilmadi, sertifikat rad etildi (`sign_failed`, E-IMZO'ning so'zlari
+    `message`da), karta yoki token PIN'i bloklandi (`sign_failed`, `message`
+    — `pin_blocked`).
+
+Bir vaqtda bitta `sign` ochiq bo'ladi. Ilovangiz o'z oynasini yopayotgan
+paytda chaqirsangiz, SDK u yopilishini bir necha soniya kutadi.
+
+Imzolangan hujjat (PKCS#7) ilovaga qaytmaydi: uni E-IMZO avvalgidek sizning
+backend'ingizga yuboradi. `signed`dan keyin hujjat holatini backend'dan
+oling. Har bir imzo YT gateway orqali o'tadi va gateway'da Kalitlar API
+imzosi sifatida sanaladi.
+
+```swift
+struct EImzoReply: Decodable {
+    struct Key: Decodable {
+        let id: String
+        let pinfl: String?
+        let name: String
+        let validFrom: String?
+        let validTo: String?
+    }
+    let status: String        // "ok", "signed", "cancelled", "error"
+    let keys: [Key]?          // getKeys
+    let code: String?         // xato bo'lsa
+    let message: String?
+}
+
+func decode(_ json: String) throws -> EImzoReply {
+    try JSONDecoder().decode(EImzoReply.self, from: Data(json.utf8))
+}
+
+let reply = try decode(await EImzoAPI.sign(keyId: key.id, deepLink: link, config: config))
+switch reply.status {
+case "signed":    break   // hujjat holatini backend'dan oling
+case "cancelled": break   // foydalanuvchi imzolamadi
+default:          print(reply.code ?? "", reply.message ?? "")
+}
+```
+
+### Xato kodlari
+
+| `code` | Qachon |
+|---|---|
+| `api_not_allowed` | integratorda «Kalitlar API» ruxsati yo'q yoki o'chirilgan |
+| `blocked` | litsenziya tekshiruvi yoki gateway ilovani yoki qurilmani rad etdi; `message` gateway kodi bilan boshlanadi (masalan `app_blocked: …`), telefondagi litsenziya rad etilsa — `licence: …` |
+| `network` | gateway'ga ulanib bo'lmadi yoki javob kelmadi |
+| `invalid_request` | `deepLink` imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
+| `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q |
+| `key_expired` | kalit sertifikati muddati tugagan (SDK yoki E-IMZO aytdi) |
+| `busy` | boshqa `sign` hali ochiq |
+| `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
+
+`message` — ishlab chiquvchi uchun inglizcha matn, foydalanuvchiga
+ko'rsatish uchun emas; unda kalit, parol yoki hesh bo'lmaydi. Android'dagi
+`not_initialized` iOS'da qaytmaydi: iOS'da init qadami yo'q.

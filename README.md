@@ -4,6 +4,7 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 
 - **iOS 16+** • **Swift 5.9+** • **SwiftUI**
 - Hammasi bir SwiftUI view'da: `EImzoView`. Host'ingiz uni sheet sifatida present qiladi va imzo natijasini callback orqali oladi.
+- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»).
 - SDK E-IMZO bilan YT gateway orqali ishlaydi, shuning uchun ilovangiz ro'yxatdan o'tgan bo'lishi kerak (pastda «Ro'yxatdan o'tish»).
 
 ## O'rnatish
@@ -16,13 +17,13 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Dependency Rule: **Up to Next Major Version**, **2.3.0** dan.
+Dependency Rule: **Up to Next Major Version**, **2.4.0** dan.
 
 Yoki `Package.swift`'ga qo'lda qo'shing:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.3.0"),
+    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
@@ -33,7 +34,7 @@ targets: [
 
 ### Manual installation
 
-GitHub Releases'dagi `2.3.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
+GitHub Releases'dagi `2.4.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
 
 ## Talablar
 
@@ -195,6 +196,58 @@ EImzoView(
 Kalit, parol, PIN va imzo yozilmaydi. Sukut bo'yicha o'chiq; release build'da
 yoqmang. Xatolar va ogohlantirishlar har doim yoziladi.
 
+## Kalitlar API
+
+2.4.0 dan SDK'ning ikkita usuli bor: `EImzoAPI.getKeys` foydalanuvchi SDK'ga
+qo'shgan kalitlar ro'yxatini beradi, `EImzoAPI.sign` esa ulardan biri bilan
+SDK'ning o'z imzo oynasi orqali imzolaydi. Ikkalasi JSON (`String`) qaytaradi.
+
+Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi: ruxsatni
+`info@yt.uz` orqali so'rang, u shartnomadan keyin beriladi va
+integratorning barcha ilovalariga tegishli. Ruxsat bo'lmasa ikkala usul
+`api_not_allowed` qaytaradi. Foydalanuvchi kalitlarini avvalgidek
+`EImzoView`da qo'shadi.
+
+```swift
+let config = EImzoConfig(environment: .prod)
+
+let keys = await EImzoAPI.getKeys(config: config)
+// {"status":"ok","keys":[{"id":"7a3f…","pinfl":"31234567890123",
+//   "name":"ALIYEV VALI ALIYEVICH","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
+
+let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
+let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
+// {"status":"signed"} · {"status":"cancelled"} · {"status":"error","code":"…","message":"…"}
+```
+
+- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `validFrom`,
+  `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar, muddati
+  o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan `sign`ga
+  bering.
+- `sign` imzo oynasini ilovangizning eng ustki ekrani ustida ochadi: domen,
+  hesh va siz tanlagan kalit. Foydalanuvchi IMZOLASH'ni bosadi, parol yoki
+  PIN faqat shu oynada kiritiladi. Imzodan keyin «Imzolandi» 3 soniyada o'zi
+  yopiladi. Bir vaqtda bitta `sign`.
+- Kalit muddati tugasa, E-IMZO imzoni rad etsa yoki PIN bloklansa, SDK
+  sababini oynada ko'rsatadi va foydalanuvchi uni yopgach xato qaytaradi.
+  Foydalanuvchi tuzatsa bo'ladigan xatodan (noto'g'ri parol, internet yo'q)
+  keyin oyna yopilsa — `cancelled`.
+- Imzolangan hujjat ilovaga qaytmaydi: E-IMZO uni avvalgidek backend'ingizga
+  yuboradi.
+
+| `code` | Qachon |
+|---|---|
+| `api_not_allowed` | «Kalitlar API» ruxsati yo'q yoki o'chirilgan |
+| `blocked` | litsenziya tekshiruvi yoki gateway ilovani yoki qurilmani rad etdi; `message` kod bilan boshlanadi (`app_blocked: …`, `licence: …`) |
+| `network` | gateway'ga ulanib bo'lmadi yoki javob kelmadi |
+| `invalid_request` | `deepLink` imzo so'rovi emas yoki uning sayti E-IMZO'da ro'yxatdan o'tmagan |
+| `key_not_found` | bu `id` bilan shu muhitda kalit yo'q |
+| `key_expired` | kalit sertifikati muddati tugagan |
+| `busy` | boshqa `sign` hali ochiq |
+| `sign_failed` | E-IMZO imzoni rad etdi, PIN bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
+
+To'liq tavsif: [INTEGRATION.md, 11-bo'lim](docs/INTEGRATION.md#11-kalitlar-api).
+
 ## Xato va crash hisobotlari
 
 SDK foydalanuvchi duch kelgan xatolarni va SDK ichida boshlangan crash'larni
@@ -242,15 +295,13 @@ bilan keladi.
 4. `EImzoConfig(isTestMode:)` o'rniga `EImzoConfig(environment:)` yozing.
 5. Sheet'ni `onSignComplete`da yoping: u «Ilovaga qaytish»dan (yoki taxminan 3 soniyadan) yoki «Tayyor»dan keyin keladi.
 6. App Store Connect → App Privacy: Crash Data va Other Diagnostic Data.
-7. SPM: `from: "2.3.0"`.
+7. SPM: `from: "2.4.0"`.
 
 2.3 dan oldin qo'shilgan ID karta va USB token kalitlarida muddat noto'g'ri saqlangan va JSHSHIR yo'q. To'g'rilash uchun kalitni qayta qo'shish kerak.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — 2.3 uchun SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.3.0"`). Ikkita tugma bor: SDK'ni so'rovsiz ochish va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan ochish. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
-
-Ishga tushirish: `EimzoExample.xcodeproj`ni oching, Signing & Capabilities'da Team'ingizni tanlang va bundle ID'ni o'zingiznikiga almashtiring. Shu bundle ID va Team ID ro'yxatdan o'tgan bo'lishi kerak (yuqoridagi «Ro'yxatdan o'tish»), aks holda SDK bloklangan ekranni ko'rsatadi. Ilovani haqiqiy iPhone'da sinang: iOS Simulator'da ham SDK bloklangan ekranni ko'rsatadi.
+Repodagi `EimzoExample/` 1.x uchun yozilgan va 2.3 ga moslanmagan: u `eimzo://` sxemasini ro'yxatdan o'tkazadi va `isTestMode`ni ishlatadi. 2.3 uchun shu README va [INTEGRATION.md](docs/INTEGRATION.md)dagi koddan foydalaning.
 
 ## Documentation
 
