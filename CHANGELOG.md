@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.4.1 — 2026-11-09
+
+The SDK itself is as in 2.4.0.
+
+**Fix: the framework says its own version.** In every 2.x release so far,
+`EimzoSDK.framework`'s Info.plist said version 1.1.7, build 1. Both now
+follow the SDK's own version: 2.4.1, the one its settings screen shows.
+
+**New: the example app shows the Keys API.** In `EimzoExample`,
+«Kalitlar ro'yxati» calls `EImzoAPI.getKeys` and shows the JSON it returns,
+with a picker for the key; «Tanlangan kalit bilan imzolash» signs the
+example's sign request with that key through `EImzoAPI.sign` and shows its
+JSON. The Keys API needs YT's permission: without it both return
+`api_not_allowed`.
+
 ## 2.4.0 — 2026-11-09
 
 **New: the Keys API («Kalitlar API»), for integrators YT has given the

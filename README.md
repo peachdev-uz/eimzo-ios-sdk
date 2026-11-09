@@ -17,13 +17,13 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Dependency Rule: **Up to Next Major Version**, **2.4.0** dan.
+Dependency Rule: **Up to Next Major Version**, **2.4.1** dan.
 
 Yoki `Package.swift`'ga qo'lda qo'shing:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0"),
+    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
@@ -34,7 +34,7 @@ targets: [
 
 ### Manual installation
 
-GitHub Releases'dagi `2.4.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
+GitHub Releases'dagi `2.4.1` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
 
 ## Talablar
 
@@ -295,13 +295,17 @@ bilan keladi.
 4. `EImzoConfig(isTestMode:)` o'rniga `EImzoConfig(environment:)` yozing.
 5. Sheet'ni `onSignComplete`da yoping: u «Ilovaga qaytish»dan (yoki taxminan 3 soniyadan) yoki «Tayyor»dan keyin keladi.
 6. App Store Connect → App Privacy: Crash Data va Other Diagnostic Data.
-7. SPM: `from: "2.4.0"`.
+7. SPM: `from: "2.4.1"`.
 
 2.3 dan oldin qo'shilgan ID karta va USB token kalitlarida muddat noto'g'ri saqlangan va JSHSHIR yo'q. To'g'rilash uchun kalitni qayta qo'shish kerak.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample/` 1.x uchun yozilgan va 2.3 ga moslanmagan: u `eimzo://` sxemasini ro'yxatdan o'tkazadi va `isTestMode`ni ishlatadi. 2.3 uchun shu README va [INTEGRATION.md](docs/INTEGRATION.md)dagi koddan foydalaning.
+Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.4.1"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
+
+Pastdagi ikkita tugma — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi va natija JSON'ini ko'rsatadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
+
+Ishga tushirish: `EimzoExample.xcodeproj`ni oching, Signing & Capabilities'da Team'ingizni tanlang va bundle ID'ni o'zingiznikiga almashtiring. Shu bundle ID va Team ID ro'yxatdan o'tgan bo'lishi kerak (yuqoridagi «Ro'yxatdan o'tish»), aks holda SDK bloklangan ekranni ko'rsatadi, Kalitlar API esa `blocked` qaytaradi. Ilovani haqiqiy iPhone'da sinang: iOS Simulator'da App Attest ishlamaydi, u yerda ham shunday bo'ladi.
 
 ## Documentation
 

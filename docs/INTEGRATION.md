@@ -57,13 +57,13 @@ Xcode → File → Add Package Dependencies → URL:
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Version rule: **Up to Next Major Version** dan **2.4.0**. Product:
+Version rule: **Up to Next Major Version** dan **2.4.1**. Product:
 `EimzoSDK`.
 
 `Package.swift`da:
 
 ```swift
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1")
 // target'da:
 .product(name: "EimzoSDK", package: "eimzo-ios-sdk")
 ```
@@ -262,10 +262,10 @@ narsa bo'lsa, shu yerda yoziladi. Bu minor versiyada ham bo'lishi mumkin:
 2.3.0 dan ilova ro'yxatdan o'tgan bo'lishi kerak.
 
 ```
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1")
 ```
 
-`from: "2.4.0"` semantic versioning bo'yicha 2.4.0 va undan yangi 2.x
+`from: "2.4.1"` semantic versioning bo'yicha 2.4.1 va undan yangi 2.x
 versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 
 ## 11. Kalitlar API
