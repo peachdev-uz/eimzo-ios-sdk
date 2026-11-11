@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.6.0 — unreleased
+
+**New: add a key from the app's own code, with no SDK screen.** For an
+integrator with the Keys API permission, `EImzoAPI` gains four methods:
+
+- `addPfxKey(pfx:password:savePassword:config:)` — a .pfx file's bytes and
+  its password;
+- `addQrKey(qrCode:password:savePassword:config:)` — a key QR code's text
+  and the key's password;
+- `addIdCardKey(pin:savePin:config:)` — an ID card and its PIN. iOS reads a
+  card only through its own NFC sheet, so that sheet still shows; closing
+  it is `cancelled`;
+- `addTokenKey(pin:savePin:config:)` — the USB or BAIK token plugged in; the
+  SDK tells which.
+
+Each returns `{"status":"added","key":{…}}`, the key as `getKeys` lists it,
+or `{"status":"exists","key":{…}}` when the key is stored already — nothing
+changes then, its saved password or PIN neither. New error codes:
+`wrong_password`, `wrong_pin` (with `"triesLeft"` when the card or token
+says), `pin_blocked`, `invalid_key`, `nfc_unavailable`, `card_read_failed`,
+`token_not_found` and `add_failed`; `busy` when another add is running.
+
+The password, the PIN and the key file pass through the app's own code, and
+the integrator answers for them under its contract with YT. `savePassword`
+and `savePin` default to `false`. The SDK never retries a PIN: each wrong
+one costs one of the card's or the token's attempts.
+
 ## 2.5.0 — 2026-11-11
 
 **New: the SDK's screens in the app's own design.** `EImzoConfig` takes
