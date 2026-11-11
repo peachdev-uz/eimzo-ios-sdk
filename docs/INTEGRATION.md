@@ -312,6 +312,7 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
 ```json
 {"status":"ok","keys":[
   {"id":"7a3f…","pinfl":"31234567890123","name":"ALIYEV VALI ALIYEVICH",
+   "tin":"301234567","organization":"\"QUYOSH\" MCHJ",
    "type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}
 ]}
 ```
@@ -319,7 +320,12 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
 - `id` — sertifikat seriya raqami, SDK saqlaganidek. Uni o'zgartirmasdan
   `sign`ga bering.
 - `pinfl` — JSHSHIR; sertifikatda bo'lmasa `null`.
-- `name` — sertifikat egasining ismi.
+- `name` — sertifikat egasining ismi (yuridik shaxs kalitida ham — xodim).
+- `tin`, `organization` (2.6 dan) — yuridik shaxs kaliti: korxonaning STIRi
+  va nomi. Jismoniy shaxsning o'z kalitida ikkalasi `null`, shuning uchun
+  `tin` bor kalit — yuridik shaxs kaliti. 2.6 dan oldin qo'shilgan ID karta
+  va USB token kalitlarida STIR saqlanmagan: ular uchun `tin` kalit qayta
+  qo'shilguncha `null`.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
   qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token).
   Boshqa qiymat kelsa (keyingi versiyalarda yangi tur qo'shilishi mumkin),
@@ -337,7 +343,7 @@ Bitta odamning bir nechta kaliti bo'lsa (masalan, ID karta, token va kalit
 fayli), har biri alohida yozuv: `id` lari har xil, `pinfl` va `name` bir xil,
 `type` qaysi biri qaysi ekanini aytadi.
 
-STIR, tashkilot, parol va kalitning o'zi qaytarilmaydi.
+Parol va kalitning o'zi qaytarilmaydi.
 
 ### Imzo
 
@@ -393,6 +399,8 @@ struct EImzoReply: Decodable {
         let id: String
         let pinfl: String?
         let name: String
+        let tin: String?          // 2.6 dan: yuridik shaxs kalitida korxona STIRi
+        let organization: String? // 2.6 dan: korxona nomi
         let type: String?     // 2.5 dan; eski SDK'da yo'q
         let validFrom: String?
         let validTo: String?
@@ -443,6 +451,13 @@ yozmaydi.
   Entitlement va Info.plist yozuvlari 3-bo'limdagidek.
 - **Token** avval ulangan bo'lishi kerak; qaysi biri ulanganini (USB yoki
   BAIK) SDK o'zi aniqlaydi. Ulanmagan bo'lsa — `token_not_found`.
+- **PIN.** ID karta va USB token PIN'i — aynan 8 ta raqam (0–9). Boshqa narsa
+  — oxiriga tushib qolgan bo'sh joy yoki qator oxiri, guruhlab yozilgan
+  (`1234 5678`), bitta raqam kam yoki ortiq — kartaga yuborilmaydi: darhol
+  `wrong_pin`, `message` «The PIN must be 8 digits; nothing was sent.»,
+  `triesLeft` yo'q, urinish sarflanmaydi. SDK hech narsani kesmaydi — PIN'ni
+  foydalanuvchi kiritgandek bering. BAIK token PIN'i — u qanday o'rnatilgan
+  bo'lsa shunday (bo'sh bo'lmasin).
 - **Parol va PIN saqlash.** `savePassword` / `savePin` standart holda `false`:
   hech narsa saqlanmaydi va `sign` parol yoki PIN'ni o'z oynasida so'raydi.
   `true` bo'lsa SDK uni saqlaydi va `sign` so'ramasdan imzolaydi (SDK
@@ -450,7 +465,8 @@ yozmaydi.
 - **Muhit.** Kalit tanlangan muhit (`environment`, 6-bo'lim) uchun saqlanadi
   va keyin `getKeys`da chiqadi. Birinchi qo'shilgan kalit asosiy bo'ladi.
 - **Tekshiruvlar tartibi:** ruxsat; kirish (bo'sh fayl yoki QR kod —
-  `invalid_key`, bo'sh PIN — `wrong_pin`, kartaga yuborilmaydi); boshqa
+  `invalid_key`, bo'sh yoki 8 ta raqam bo'lmagan PIN — `wrong_pin`, kartaga
+  yuborilmaydi); boshqa
   qo'shish ishlamayaptimi (`busy`, bir vaqtda bitta). Keyin kalit o'qiladi.
   PFX va QR kalit sertifikati E-IMZO'dan YT gateway orqali so'raladi; gateway
   ruxsatni shu chaqiruvda ham tekshiradi. ID karta va token gateway'ga
@@ -458,7 +474,7 @@ yozmaydi.
 
 Javoblar — kalit `getKeys`dagi shaklda:
 
-- `{"status":"added","key":{"id":…,"pinfl":…,"name":…,"type":…,"validFrom":…,"validTo":…}}`
+- `{"status":"added","key":{"id":…,"pinfl":…,"name":…,"tin":…,"organization":…,"type":…,"validFrom":…,"validTo":…}}`
   — kalit qo'shildi; `key.id`ni `sign`ga bering.
 - `{"status":"exists","key":{…}}` — bu kalit allaqachon bor. Xato emas:
   saqlangan kalit qaytadi va hech narsa o'zgarmaydi, saqlangan parol yoki PIN
@@ -485,7 +501,7 @@ foydalanuvchidan PIN'ni qayta so'rang.
 | `busy` | boshqa `sign` hali ochiq yoki boshqa kalit qo'shilmoqda |
 | `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
 | `wrong_password` | qo'shish: kalit fayli yoki QR kalitning paroli noto'g'ri |
-| `wrong_pin` | qo'shish: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa) |
+| `wrong_pin` | qo'shish: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa). PIN bo'sh yoki 8 ta raqam bo'lmasa ham — `triesLeft`siz, kartaga hech narsa yuborilmagan |
 | `pin_blocked` | qo'shish: karta yoki token PIN'i bloklangan |
 | `invalid_key` | qo'shish: fayl kalit fayli emas, QR kod kalit QR'i emas, karta E-IMZO kartasi emas, tokenda kalit yo'q yoki E-IMZO sertifikatni qabul qilmadi |
 | `nfc_unavailable` | qo'shish: telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |

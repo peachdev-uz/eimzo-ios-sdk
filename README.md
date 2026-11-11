@@ -257,21 +257,27 @@ let config = EImzoConfig(environment: .prod)
 
 let keys = await EImzoAPI.getKeys(config: config)
 // {"status":"ok","keys":[{"id":"7a3f…","pinfl":"31234567890123",
-//   "name":"ALIYEV VALI ALIYEVICH","type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
+//   "name":"ALIYEV VALI ALIYEVICH","tin":"301234567","organization":"\"QUYOSH\" MCHJ",
+//   "type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
 
 let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
 let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
 // {"status":"signed"} · {"status":"cancelled"} · {"status":"error","code":"…","message":"…"}
 ```
 
-- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `type`,
-  `validFrom`, `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar,
+- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `tin`,
+  `organization`, `type`, `validFrom`, `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar,
   muddati o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan
   `sign`ga bering.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
   qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token). Bitta
   odamning ID kartasi, tokeni va kalit fayli alohida-alohida keladi: `pinfl`
   va `name` bir xil, `type` har xil.
+- `tin` va `organization` (2.6 dan) — yuridik shaxs kaliti: korxonaning STIRi
+  va nomi. Jismoniy shaxsning o'z kalitida ikkalasi `null`, shuning uchun
+  `tin` bor kalit — yuridik shaxs kaliti. `name` ikkala holda ham sertifikat
+  egasi (xodim). 2.6 dan oldin qo'shilgan ID karta va USB token kalitlarida
+  STIR saqlanmagan: ular uchun `tin` kalit qayta qo'shilguncha `null`.
 - `sign` imzo oynasini ilovangizning eng ustki ekrani ustida ochadi: domen,
   hesh va siz tanlagan kalit. Foydalanuvchi IMZOLASH'ni bosadi, parol yoki
   PIN faqat shu oynada kiritiladi. Imzodan keyin «Imzolandi» 3 soniyada o'zi
@@ -289,7 +295,8 @@ Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
 
 ```swift
 let added = await EImzoAPI.addPfxKey(pfx: data, password: password, config: config)
-// {"status":"added","key":{"id":"7a3f…","pinfl":"…","name":"…","type":"pfx","validFrom":"…","validTo":"…"}}
+// {"status":"added","key":{"id":"7a3f…","pinfl":"…","name":"…","tin":null,"organization":null,
+//   "type":"pfx","validFrom":"…","validTo":"…"}}
 
 await EImzoAPI.addQrKey(qrCode: text, password: password, config: config)
 await EImzoAPI.addIdCardKey(pin: pin, config: config)   // tizimning NFC oynasi chiqadi
@@ -305,6 +312,11 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
   NFC sozlamalari `EImzoView`dagi ID karta uchun bilan bir xil.
 - Token: qaysi biri ulanganini (USB yoki BAIK) SDK o'zi aniqlaydi; ulanmagan
   bo'lsa — `token_not_found`.
+- **PIN.** ID karta va USB token PIN'i — aynan 8 ta raqam (0–9). Boshqa narsa
+  (oxiriga tushib qolgan bo'sh joy, guruhlab yozilgan, bitta raqam kam yoki
+  ortiq) kartaga yuborilmaydi: darhol `wrong_pin`, «nothing was sent», urinish
+  sarflanmaydi. SDK hech narsani kesmaydi — PIN'ni foydalanuvchi kiritgandek
+  bering. BAIK token PIN'i — u qanday o'rnatilgan bo'lsa shunday.
 - `savePassword` / `savePin` standart holda `false`: hech narsa saqlanmaydi,
   `sign` parolni yoki PIN'ni o'z oynasida so'raydi. `true` bo'lsa SDK uni
   saqlaydi va `sign` so'ramasdan imzolaydi — buni foydalanuvchidan so'rab
