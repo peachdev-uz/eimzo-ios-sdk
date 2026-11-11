@@ -17,13 +17,13 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Dependency Rule: **Up to Next Major Version**, **2.4.1** dan.
+Dependency Rule: **Up to Next Major Version**, **2.5.0** dan.
 
 Yoki `Package.swift`'ga qo'lda qo'shing:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1"),
+    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.5.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
@@ -34,7 +34,7 @@ targets: [
 
 ### Manual installation
 
-GitHub Releases'dagi `2.4.1` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
+GitHub Releases'dagi `2.5.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
 
 ## Talablar
 
@@ -196,6 +196,49 @@ EImzoView(
 Kalit, parol, PIN va imzo yozilmaydi. Sukut bo'yicha o'chiq; release build'da
 yoqmang. Xatolar va ogohlantirishlar har doim yoziladi.
 
+## Dizayn (2.5.0 dan)
+
+SDK ekranlarini ilovangiz ko'rinishiga moslash mumkin. Hammasi `EImzoConfig`da
+beriladi; hech biri berilmasa, SDK o'zining E-IMZO dizaynida qoladi.
+
+```swift
+EImzoView(config: EImzoConfig(
+    environment: .prod,
+    appearance: EImzoAppearance(
+        light: EImzoPalette(primary: Color("Brand"), background: .white,
+                            surface: Color(white: 0.96), text: .black,
+                            textSecondary: .gray, divider: Color(white: 0.9)),
+        dark: EImzoPalette(primary: Color("Brand")),   // nil → SDK tungi ranglari + primary
+        themeMode: .system,                            // .light, .dark
+        fontFamily: "Inter",                           // UIAppFonts'da ro'yxatdan o'tgan
+        cornerRadius: 12                               // nil → 16
+    ),
+    language: .ru,                                     // nil → SDK sozlamasi / telefon tili
+    showsLanguagePicker: false,                        // standart true
+    hashDisplay: .hidden                               // standart .visible
+))
+```
+
+| Sozlama | Standart | Nima qiladi |
+|---|---|---|
+| `appearance.light`, `.dark` | yo'q | 6 ta rang: `primary` (tugmalar, havolalar), `background` (sahifa), `surface` (kartalar, oynalar, PIN tugmalari), `text`, `textSecondary` (izohlar), `divider`. Har biri ixtiyoriy — berilmagani SDK'niki. Qolgan ranglarni SDK shulardan hisoblaydi. |
+| `appearance.themeMode` | `.system` | Faqat SDK ekranlari uchun: telefon sozlamasi, doim yorug' yoki doim tungi. |
+| `appearance.fontFamily` | tizim shrifti | Ilovada ro'yxatdan o'tgan shrift oilasi; topilmasa — tizim shrifti va konsolda ogohlantirish. Hesh-kod tizimning monospace shriftida qoladi. |
+| `appearance.cornerRadius` | 16 | Tugma radiusi (0–28); karta va oynalar mutanosib o'zgaradi. |
+| `language` | yo'q | `.uz`, `.ru` yoki `.en`. `showsLanguagePicker` yoqiq bo'lsa — boshlang'ich til, foydalanuvchi SDK sozlamalarida almashtira oladi. |
+| `showsLanguagePicker` | `true` | `false`: SDK sozlamalarida til qatori yo'q, til doim `language` (yo'q bo'lsa telefon tili). |
+| `hashDisplay` | `.visible` | `.hidden`: ilova o'zi bergan so'rovda (`EImzoView(deepLink:)`, `EImzoAPI.sign`) hash kartasi chiqmaydi. SDK skaneri o'qigan QR so'rovda hash doim ko'rinadi. |
+
+O'zgarmaydigan qismlar — imzolovchini himoya qiladi: imzo so'ragan sayt nomi,
+kalit egasi, «Imzolash» tugmasi (faqat rangi `primary`dan), PIN va parol
+kiritish oynasi, xato va ogohlantirish ranglari, «Imzolandi» ekranidagi yashil
+belgi, kalit kartasi va QR skaner. Matn fon yoki kartada 4.5:1 dan past
+o'qilsa, o'sha rejimda ranglaringiz olinmaydi — SDK o'z ranglarida qoladi va
+sababini konsolga yozadi.
+
+`appearance` berilganda bosh sahifada sakura rasmi chiqmaydi, «Imzolandi» va
+«Tayyor» ekranlari esa ilova ranglarida chiqadi.
+
 ## Kalitlar API
 
 2.4.0 dan SDK'ning ikkita usuli bor: `EImzoAPI.getKeys` foydalanuvchi SDK'ga
@@ -213,17 +256,21 @@ let config = EImzoConfig(environment: .prod)
 
 let keys = await EImzoAPI.getKeys(config: config)
 // {"status":"ok","keys":[{"id":"7a3f…","pinfl":"31234567890123",
-//   "name":"ALIYEV VALI ALIYEVICH","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
+//   "name":"ALIYEV VALI ALIYEVICH","type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
 
 let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
 let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
 // {"status":"signed"} · {"status":"cancelled"} · {"status":"error","code":"…","message":"…"}
 ```
 
-- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `validFrom`,
-  `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar, muddati
-  o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan `sign`ga
-  bering.
+- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `type`,
+  `validFrom`, `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar,
+  muddati o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan
+  `sign`ga bering.
+- `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
+  qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token). Bitta
+  odamning ID kartasi, tokeni va kalit fayli alohida-alohida keladi: `pinfl`
+  va `name` bir xil, `type` har xil.
 - `sign` imzo oynasini ilovangizning eng ustki ekrani ustida ochadi: domen,
   hesh va siz tanlagan kalit. Foydalanuvchi IMZOLASH'ni bosadi, parol yoki
   PIN faqat shu oynada kiritiladi. Imzodan keyin «Imzolandi» 3 soniyada o'zi
@@ -295,13 +342,13 @@ bilan keladi.
 4. `EImzoConfig(isTestMode:)` o'rniga `EImzoConfig(environment:)` yozing.
 5. Sheet'ni `onSignComplete`da yoping: u «Ilovaga qaytish»dan (yoki taxminan 3 soniyadan) yoki «Tayyor»dan keyin keladi.
 6. App Store Connect → App Privacy: Crash Data va Other Diagnostic Data.
-7. SPM: `from: "2.4.1"`.
+7. SPM: `from: "2.5.0"`.
 
 2.3 dan oldin qo'shilgan ID karta va USB token kalitlarida muddat noto'g'ri saqlangan va JSHSHIR yo'q. To'g'rilash uchun kalitni qayta qo'shish kerak.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.4.1"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
+Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.5.0"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
 
 Pastdagi ikkita tugma — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi va natija JSON'ini ko'rsatadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
 

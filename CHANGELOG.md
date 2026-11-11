@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.5.0 — 2026-11-11
+
+**New: the SDK's screens in the app's own design.** `EImzoConfig` takes
+four new options, all defaulted — without them the SDK looks as before:
+
+- `appearance: EImzoAppearance` — six colours per mode (`primary`,
+  `background`, `surface`, `text`, `textSecondary`, `divider`; each
+  optional), `themeMode` (`.system`, `.light`, `.dark`), `fontFamily` and
+  `cornerRadius`. The SDK derives the rest of its tones from the six. A mode
+  whose text reads under 4.5:1 on its background or surface is not used, and
+  the console says why. With an appearance the home screen has no sakura
+  header, and «Imzolandi»/«Tayyor» are drawn in the app's colours.
+- `language` and `showsLanguagePicker` — the language the SDK opens in, and
+  whether its Settings offer the language row.
+- `hashDisplay: .hidden` — no hash card for a request the app itself hands
+  the SDK. A request read with the SDK's QR scanner always shows it.
+
+What never changes: the requesting site, the key holder, «Imzolash» (only
+its colour follows `primary`), PIN and password entry, the error and warning
+colours, the green «Imzolandi» mark, the key card and the QR scanner.
+
+**New: each key from `EImzoAPI.getKeys` says what it is.** The new field
+`type` is `pfx` (a key file, added from a file or a QR code), `id_card` (an
+ID card) or `token` (a USB or BAIK token), so an app can tell one holder's
+keys apart. It comes after `name`; nothing else in the Keys API changed.
+Later versions may add a kind: show a value you do not know as a plain key.
+
 ## 2.4.1 — 2026-11-09
 
 The SDK itself is as in 2.4.0.

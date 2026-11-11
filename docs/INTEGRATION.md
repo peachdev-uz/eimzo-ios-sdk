@@ -57,13 +57,13 @@ Xcode → File → Add Package Dependencies → URL:
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Version rule: **Up to Next Major Version** dan **2.4.1**. Product:
+Version rule: **Up to Next Major Version** dan **2.5.0**. Product:
 `EimzoSDK`.
 
 `Package.swift`da:
 
 ```swift
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.5.0")
 // target'da:
 .product(name: "EimzoSDK", package: "eimzo-ios-sdk")
 ```
@@ -262,10 +262,10 @@ narsa bo'lsa, shu yerda yoziladi. Bu minor versiyada ham bo'lishi mumkin:
 2.3.0 dan ilova ro'yxatdan o'tgan bo'lishi kerak.
 
 ```
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.4.1")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.5.0")
 ```
 
-`from: "2.4.1"` semantic versioning bo'yicha 2.4.1 va undan yangi 2.x
+`from: "2.5.0"` semantic versioning bo'yicha 2.5.0 va undan yangi 2.x
 versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 
 ## 11. Kalitlar API
@@ -308,7 +308,7 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
 ```json
 {"status":"ok","keys":[
   {"id":"7a3f…","pinfl":"31234567890123","name":"ALIYEV VALI ALIYEVICH",
-   "validFrom":"2025-03-01","validTo":"2027-03-01"}
+   "type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}
 ]}
 ```
 
@@ -316,6 +316,10 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
   `sign`ga bering.
 - `pinfl` — JSHSHIR; sertifikatda bo'lmasa `null`.
 - `name` — sertifikat egasining ismi.
+- `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
+  qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token).
+  Boshqa qiymat kelsa (keyingi versiyalarda yangi tur qo'shilishi mumkin),
+  uni oddiy kalit deb ko'rsating.
 - `validFrom`, `validTo` — `yyyy-MM-dd` (soatsiz); SDK sanani o'qiy olmasa
   `null`.
 
@@ -325,7 +329,11 @@ barcha turdagi kalitlar bor. Muddati o'tganlari ham kiradi — ularni
 qo'shilgan kalit kirmaydi. Tartib SDK'ning o'z ro'yxatidagidek: asosiy kalit
 birinchi. Kalit bo'lmasa — `{"status":"ok","keys":[]}`.
 
-STIR, tashkilot, kalit turi, parol va kalitning o'zi qaytarilmaydi.
+Bitta odamning bir nechta kaliti bo'lsa (masalan, ID karta, token va kalit
+fayli), har biri alohida yozuv: `id` lari har xil, `pinfl` va `name` bir xil,
+`type` qaysi biri qaysi ekanini aytadi.
+
+STIR, tashkilot, parol va kalitning o'zi qaytarilmaydi.
 
 ### Imzo
 
@@ -381,6 +389,7 @@ struct EImzoReply: Decodable {
         let id: String
         let pinfl: String?
         let name: String
+        let type: String?     // 2.5 dan; eski SDK'da yo'q
         let validFrom: String?
         let validTo: String?
     }
@@ -418,3 +427,50 @@ default:          print(reply.code ?? "", reply.message ?? "")
 `message` — ishlab chiquvchi uchun inglizcha matn, foydalanuvchiga
 ko'rsatish uchun emas; unda kalit, parol yoki hesh bo'lmaydi. Android'dagi
 `not_initialized` iOS'da qaytmaydi: iOS'da init qadami yo'q.
+
+## 12. Dizayn (2.5.0 dan)
+
+SDK ekranlari ilovangiz ranglari, shrifti va burchaklarida chiqishi mumkin.
+Hammasi `EImzoConfig`da beriladi; `appearance` yo'q bo'lsa SDK o'z dizaynida.
+
+```swift
+let config = EImzoConfig(
+    environment: .prod,
+    appearance: EImzoAppearance(
+        light: EImzoPalette(primary: Color("Brand"), background: .white,
+                            surface: Color("Card"), text: Color("Text"),
+                            textSecondary: Color("TextSecondary"), divider: Color("Divider")),
+        dark: EImzoPalette(primary: Color("Brand"), background: Color("BackgroundDark"),
+                           surface: Color("CardDark"), text: .white),
+        themeMode: .system,
+        fontFamily: "Inter",
+        cornerRadius: 12
+    ),
+    language: .ru,
+    showsLanguagePicker: false,
+    hashDisplay: .hidden
+)
+```
+
+- **Ranglar.** Har rejim uchun 6 ta: `primary`, `background`, `surface`,
+  `text`, `textSecondary`, `divider`. Berilmagan rang SDK'niki. `dark`
+  berilmasa tungi rejimda SDK'ning tungi ranglari, lekin `primary` sizniki
+  (tungi fonda o'qiladigan qilib moslanadi). Asset katalogidagi light/dark
+  rang har rejimda o'z variantida o'qiladi. Shaffoflik hisobga olinmaydi.
+- **Kontrast.** `text` `background` yoki `surface`da 4.5:1 dan past o'qilsa,
+  o'sha rejimning ranglari olinmaydi va konsolga sababi yoziladi. Havola rangi,
+  ikkinchi darajali matn va tugma ustidagi matn kontrastga o'zi moslanadi.
+- **Shrift.** `fontFamily` — ilova `UIAppFonts` orqali ro'yxatdan o'tkazgan
+  oila (yoki uning bitta yuzining nomi). SDK regular, medium va semibold
+  yuzlarini oladi va Dynamic Type bilan kattalashtiradi.
+- **Rejim.** `themeMode: .light`/`.dark` faqat SDK ekranlariga ta'sir qiladi;
+  `EImzoView`ni sheet yoki fullScreenCover ichida ko'rsating.
+- **Til.** `language` + `showsLanguagePicker: false` — ilovaning o'z til
+  tanlovi bo'lsa, joriy tilini har safar shu yerda bering.
+- **Hash.** `hashDisplay: .hidden` faqat ilova bergan so'rovga tegishli;
+  SDK skaneri o'qigan QR'da hash doim ko'rinadi.
+- **O'zgarmaydi:** sayt nomi, kalit egasi, «Imzolash» (rangi `primary`dan),
+  PIN/parol oynasi, xato va ogohlantirish ranglari, yashil «Imzolandi»
+  belgisi, kalit kartasi, QR skaner.
+- `appearance` va til sozlamalari litsenziya tekshiruviga ta'sir qilmaydi:
+  ko'rinishni o'zgartirish qayta tekshiruv talab qilmaydi.
