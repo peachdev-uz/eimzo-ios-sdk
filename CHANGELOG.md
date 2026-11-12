@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.6.0 — unreleased
+## 2.6.0 — 2026-11-12
 
 **New: add a key from the app's own code, with no SDK screen.** For an
 integrator with the Keys API permission, `EImzoAPI` gains four methods:
