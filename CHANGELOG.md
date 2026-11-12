@@ -1,5 +1,59 @@
 # Changelog
 
+## 2.6.0 — unreleased
+
+**New: add a key from the app's own code, with no SDK screen.** For an
+integrator with the Keys API permission, `EImzoAPI` gains four methods:
+
+- `addPfxKey(pfx:password:savePassword:config:)` — a .pfx file's bytes and
+  its password;
+- `addQrKey(qrCode:password:savePassword:config:)` — a key QR code's text
+  and the key's password;
+- `addIdCardKey(pin:savePin:config:)` — an ID card and its PIN. iOS reads a
+  card only through its own NFC sheet, so that sheet still shows; closing
+  it is `cancelled`;
+- `addTokenKey(pin:savePin:config:)` — the USB or BAIK token plugged in; the
+  SDK tells which.
+
+Each returns `{"status":"added","key":{…}}`, the key as `getKeys` lists it,
+or `{"status":"exists","key":{…}}` when the key is stored already — nothing
+changes then, its saved password or PIN neither. New error codes:
+`wrong_password`, `wrong_pin` (with `"triesLeft"` when the card or token
+says), `pin_blocked`, `invalid_key`, `nfc_unavailable`, `card_read_failed`,
+`token_not_found` and `add_failed`; `busy` when another add is running.
+
+The password, the PIN and the key file pass through the app's own code, and
+the integrator answers for them under its contract with YT. `savePassword`
+and `savePin` default to `false`. The SDK never retries a PIN: each wrong
+one costs one of the card's or the token's attempts. An ID card's or a USB
+token's PIN must be exactly eight digits 0–9: anything else — a space
+pasted on, a digit short — is `wrong_pin`, "nothing was sent", and no
+attempt is spent. Nothing is trimmed. A BAIK token's PIN is whatever it was
+set up with.
+
+**New: STIR and organisation in the key list.** A key, in `getKeys` and in
+the add methods' answers, now has eight fields: after `name` come `tin` and
+`organization` — a legal entity's key's organisation, its STIR and name.
+Both are `null` on a person's own key, so a key with a `tin` is a legal
+entity's. An ID card or USB token key added before 2.6.0 has no STIR stored
+until it is added again.
+
+**Fixed**
+
+- A PIN that is not a number went to the card as all zeros, and one too
+  long had its first digits cut; the card counted a wrong attempt. Such a
+  PIN is now never sent. The SDK's own keypad only ever gave eight digits,
+  so this could happen only through the new add methods.
+- A key whose certificate E-IMZO does not know (`pki.cert_info` answered
+  with no serial number) was stored with an empty serial. It is now refused:
+  `invalid_key` in the Keys API, «the certificate could not be checked» on
+  the SDK's screen — as on Android.
+- An ID card or USB token key of a legal entity now carries its STIR and
+  organisation, as a key file and a BAIK token already did; the SDK's
+  screens name it by its organisation.
+- `Pfx2qr.xcframework` was rebuilt without the build machine's paths in the
+  binary. Its code is unchanged.
+
 ## 2.5.0 — 2026-11-11
 
 **New: the SDK's screens in the app's own design.** `EImzoConfig` takes

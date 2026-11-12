@@ -277,7 +277,10 @@ versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 - `EImzoAPI.sign(keyId:deepLink:config:)` — shu kalitlardan biri bilan imzo,
   SDK'ning o'z imzo oynasi orqali.
 
-Ikkalasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
+2.6.0 dan — kalitni SDK oynasisiz, ilova kodidan qo'shish: `addPfxKey`,
+`addQrKey`, `addIdCardKey`, `addTokenKey` (pastda «Kalit qo'shish»).
+
+Hammasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
 marta. Usul nomlari, JSON shakli va xato kodlari Android SDK va Flutter
 plaginida ham shunday.
 
@@ -286,13 +289,14 @@ plaginida ham shunday.
 Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi. Ruxsatni
 `info@yt.uz` orqali so'rang: u shartnoma tuzilgandan keyin beriladi va
 integratorning barcha ilovalariga tegishli. Ilova avvalgidek ro'yxatdan
-o'tgan bo'lishi kerak (1-bo'lim). Ruxsat bo'lmasa, ikkala usul
+o'tgan bo'lishi kerak (1-bo'lim). Ruxsat bo'lmasa, har bir usul
 `api_not_allowed` xatosini qaytaradi; ruxsat o'chirilsa, ochiq `sign` ham shu
-xato bilan tugaydi.
+xato bilan tugaydi. Kalit qo'shish uchun alohida ruxsat yo'q — o'sha
+«Kalitlar API».
 
 `EImzoView` avvalgidek ro'yxatdan o'tgan har bir integratorga ochiq.
-Foydalanuvchi kalitlarini o'sha yerda qo'shadi (PFX fayl, QR, ID karta, USB
-token, BAIK token): API kalit qo'shmaydi.
+Foydalanuvchi kalitlarini o'sha yerda qo'sha oladi (PFX fayl, QR, ID karta,
+USB token, BAIK token); 2.6.0 dan ilova ham qo'sha oladi.
 
 Tekshiruv uchun alohida init yo'q: har bir usul litsenziya va gateway
 tekshiruvini kerak bo'lganda o'zi bajaradi. API bloklangan ekranni
@@ -308,6 +312,7 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
 ```json
 {"status":"ok","keys":[
   {"id":"7a3f…","pinfl":"31234567890123","name":"ALIYEV VALI ALIYEVICH",
+   "tin":"301234567","organization":"\"QUYOSH\" MCHJ",
    "type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}
 ]}
 ```
@@ -315,7 +320,12 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
 - `id` — sertifikat seriya raqami, SDK saqlaganidek. Uni o'zgartirmasdan
   `sign`ga bering.
 - `pinfl` — JSHSHIR; sertifikatda bo'lmasa `null`.
-- `name` — sertifikat egasining ismi.
+- `name` — sertifikat egasining ismi (yuridik shaxs kalitida ham — xodim).
+- `tin`, `organization` (2.6 dan) — yuridik shaxs kaliti: korxonaning STIRi
+  va nomi. Jismoniy shaxsning o'z kalitida ikkalasi `null`, shuning uchun
+  `tin` bor kalit — yuridik shaxs kaliti. 2.6 dan oldin qo'shilgan ID karta
+  va USB token kalitlarida STIR saqlanmagan: ular uchun `tin` kalit qayta
+  qo'shilguncha `null`.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
   qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token).
   Boshqa qiymat kelsa (keyingi versiyalarda yangi tur qo'shilishi mumkin),
@@ -333,7 +343,7 @@ Bitta odamning bir nechta kaliti bo'lsa (masalan, ID karta, token va kalit
 fayli), har biri alohida yozuv: `id` lari har xil, `pinfl` va `name` bir xil,
 `type` qaysi biri qaysi ekanini aytadi.
 
-STIR, tashkilot, parol va kalitning o'zi qaytarilmaydi.
+Parol va kalitning o'zi qaytarilmaydi.
 
 ### Imzo
 
@@ -389,14 +399,18 @@ struct EImzoReply: Decodable {
         let id: String
         let pinfl: String?
         let name: String
+        let tin: String?          // 2.6 dan: yuridik shaxs kalitida korxona STIRi
+        let organization: String? // 2.6 dan: korxona nomi
         let type: String?     // 2.5 dan; eski SDK'da yo'q
         let validFrom: String?
         let validTo: String?
     }
-    let status: String        // "ok", "signed", "cancelled", "error"
+    let status: String        // "ok", "signed", "cancelled", "error", "added", "exists"
     let keys: [Key]?          // getKeys
+    let key: Key?             // add…Key (2.6 dan)
     let code: String?         // xato bo'lsa
     let message: String?
+    let triesLeft: Int?       // wrong_pin (2.6 dan)
 }
 
 func decode(_ json: String) throws -> EImzoReply {
@@ -411,6 +425,69 @@ default:          print(reply.code ?? "", reply.message ?? "")
 }
 ```
 
+### Kalit qo'shish (2.6.0 dan)
+
+Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
+
+| Usul | Kalit |
+|---|---|
+| `addPfxKey(pfx:password:savePassword:config:)` | .pfx fayl: baytlari (`Data`) va paroli |
+| `addQrKey(qrCode:password:savePassword:config:)` | kalit QR kodi: skaner o'qigan matn va kalit paroli |
+| `addIdCardKey(pin:savePin:config:)` | ID karta va uning PIN'i |
+| `addTokenKey(pin:savePin:config:)` | ulangan USB yoki BAIK token va uning PIN'i — qaysi biri ulanganini SDK o'zi aniqlaydi |
+
+```swift
+let json = await EImzoAPI.addPfxKey(pfx: data, password: password, config: config)
+```
+
+**Javobgarlik.** Bu usullarda parol, PIN va kalit fayli ilovangiz kodidan
+o'tadi. Ular bilan nima bo'lishi uchun integrator YT bilan shartnoma
+bo'yicha javob beradi. SDK ularni log'ga ham, xato hisobotlariga ham
+yozmaydi.
+
+- **ID karta.** iOS kartani faqat o'z NFC oynasi orqali o'qiydi, shuning
+  uchun bu oyna baribir chiqadi — SDK matni bilan, `EImzoConfig`dagi tilda.
+  Foydalanuvchi kartani telefonga tutadi; oynani yopsa — `cancelled`.
+  Entitlement va Info.plist yozuvlari 3-bo'limdagidek.
+- **Token** avval ulangan bo'lishi kerak; qaysi biri ulanganini (USB yoki
+  BAIK) SDK o'zi aniqlaydi. Ulanmagan bo'lsa — `token_not_found`.
+- **PIN.** ID karta va USB token PIN'i — aynan 8 ta raqam (0–9). Boshqa narsa
+  — oxiriga tushib qolgan bo'sh joy yoki qator oxiri, guruhlab yozilgan
+  (`1234 5678`), bitta raqam kam yoki ortiq — kartaga yuborilmaydi: darhol
+  `wrong_pin`, `message` «The PIN must be 8 digits; nothing was sent.»,
+  `triesLeft` yo'q, urinish sarflanmaydi. SDK hech narsani kesmaydi — PIN'ni
+  foydalanuvchi kiritgandek bering. BAIK token PIN'i — u qanday o'rnatilgan
+  bo'lsa shunday (bo'sh bo'lmasin).
+- **Parol va PIN saqlash.** `savePassword` / `savePin` standart holda `false`:
+  hech narsa saqlanmaydi va `sign` parol yoki PIN'ni o'z oynasida so'raydi.
+  `true` bo'lsa SDK uni saqlaydi va `sign` so'ramasdan imzolaydi (SDK
+  oynasidagi «Parolni saqlash» kabi) — buni foydalanuvchidan so'rab yoqing.
+- **Muhit.** Kalit tanlangan muhit (`environment`, 6-bo'lim) uchun saqlanadi
+  va keyin `getKeys`da chiqadi. Birinchi qo'shilgan kalit asosiy bo'ladi.
+- **Tekshiruvlar tartibi:** ruxsat; kirish (bo'sh fayl yoki QR kod —
+  `invalid_key`, bo'sh yoki 8 ta raqam bo'lmagan PIN — `wrong_pin`, kartaga
+  yuborilmaydi); boshqa
+  qo'shish ishlamayaptimi (`busy`, bir vaqtda bitta). Keyin kalit o'qiladi.
+  PFX va QR kalit sertifikati E-IMZO'dan YT gateway orqali so'raladi; gateway
+  ruxsatni shu chaqiruvda ham tekshiradi. ID karta va token gateway'ga
+  bormaydi.
+
+Javoblar — kalit `getKeys`dagi shaklda:
+
+- `{"status":"added","key":{"id":…,"pinfl":…,"name":…,"tin":…,"organization":…,"type":…,"validFrom":…,"validTo":…}}`
+  — kalit qo'shildi; `key.id`ni `sign`ga bering.
+- `{"status":"exists","key":{…}}` — bu kalit allaqachon bor. Xato emas:
+  saqlangan kalit qaytadi va hech narsa o'zgarmaydi, saqlangan parol yoki PIN
+  ham. Boshqa muhitda qo'shilgan bo'lsa — `add_failed`.
+- `{"status":"cancelled"}` — faqat `addIdCardKey`: NFC oynasi yopildi.
+- `{"status":"error","code":"…","message":"…"}` — `wrong_pin`da oxirida
+  `"triesLeft":N` ham keladi, karta yoki token qolgan urinishlarni aytsa.
+
+**PIN'ni siklda qayta yubormang.** SDK PIN'ni o'zi qayta urinmaydi. Har
+noto'g'ri PIN karta yoki tokenning urinishlaridan birini oladi, oxirgisi uni
+bloklaydi (`pin_blocked`). `wrong_pin` kelsa, `triesLeft`ni ko'rsatib
+foydalanuvchidan PIN'ni qayta so'rang.
+
 ### Xato kodlari
 
 | `code` | Qachon |
@@ -421,8 +498,16 @@ default:          print(reply.code ?? "", reply.message ?? "")
 | `invalid_request` | `deepLink` imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
 | `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan (SDK yoki E-IMZO aytdi) |
-| `busy` | boshqa `sign` hali ochiq |
+| `busy` | boshqa `sign` hali ochiq yoki boshqa kalit qo'shilmoqda |
 | `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
+| `wrong_password` | qo'shish: kalit fayli yoki QR kalitning paroli noto'g'ri |
+| `wrong_pin` | qo'shish: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa). PIN bo'sh yoki 8 ta raqam bo'lmasa ham — `triesLeft`siz, kartaga hech narsa yuborilmagan |
+| `pin_blocked` | qo'shish: karta yoki token PIN'i bloklangan |
+| `invalid_key` | qo'shish: fayl kalit fayli emas, QR kod kalit QR'i emas, karta E-IMZO kartasi emas, tokenda kalit yo'q yoki E-IMZO sertifikatni qabul qilmadi |
+| `nfc_unavailable` | qo'shish: telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |
+| `card_read_failed` | qo'shish: karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi |
+| `token_not_found` | qo'shish: token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band |
+| `add_failed` | qo'shish boshqa sabab bilan tugadi |
 
 `message` — ishlab chiquvchi uchun inglizcha matn, foydalanuvchiga
 ko'rsatish uchun emas; unda kalit, parol yoki hesh bo'lmaydi. Android'dagi

@@ -4,7 +4,7 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 
 - **iOS 16+** • **Swift 5.9+** • **SwiftUI**
 - Hammasi bir SwiftUI view'da: `EImzoView`. Host'ingiz uni sheet sifatida present qiladi va imzo natijasini callback orqali oladi.
-- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»).
+- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham.
 - SDK E-IMZO bilan YT gateway orqali ishlaydi, shuning uchun ilovangiz ro'yxatdan o'tgan bo'lishi kerak (pastda «Ro'yxatdan o'tish»).
 
 ## O'rnatish
@@ -243,34 +243,41 @@ sababini konsolga yozadi.
 
 2.4.0 dan SDK'ning ikkita usuli bor: `EImzoAPI.getKeys` foydalanuvchi SDK'ga
 qo'shgan kalitlar ro'yxatini beradi, `EImzoAPI.sign` esa ulardan biri bilan
-SDK'ning o'z imzo oynasi orqali imzolaydi. Ikkalasi JSON (`String`) qaytaradi.
+SDK'ning o'z imzo oynasi orqali imzolaydi. 2.6.0 dan ilova kalitni o'zi ham
+qo'sha oladi (pastda «Kalit qo'shish»). Hammasi JSON (`String`) qaytaradi.
 
 Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi: ruxsatni
 `info@yt.uz` orqali so'rang, u shartnomadan keyin beriladi va
-integratorning barcha ilovalariga tegishli. Ruxsat bo'lmasa ikkala usul
+integratorning barcha ilovalariga tegishli. Ruxsat bo'lmasa har bir usul
 `api_not_allowed` qaytaradi. Foydalanuvchi kalitlarini avvalgidek
-`EImzoView`da qo'shadi.
+`EImzoView`da ham qo'sha oladi.
 
 ```swift
 let config = EImzoConfig(environment: .prod)
 
 let keys = await EImzoAPI.getKeys(config: config)
 // {"status":"ok","keys":[{"id":"7a3f…","pinfl":"31234567890123",
-//   "name":"ALIYEV VALI ALIYEVICH","type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
+//   "name":"ALIYEV VALI ALIYEVICH","tin":"301234567","organization":"\"QUYOSH\" MCHJ",
+//   "type":"pfx","validFrom":"2025-03-01","validTo":"2027-03-01"}]}
 
 let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
 let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
 // {"status":"signed"} · {"status":"cancelled"} · {"status":"error","code":"…","message":"…"}
 ```
 
-- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `type`,
-  `validFrom`, `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar,
+- Ro'yxatda faqat `id`, `pinfl` (yo'q bo'lsa `null`), `name`, `tin`,
+  `organization`, `type`, `validFrom`, `validTo` (`yyyy-MM-dd`). Tanlangan muhitdagi barcha kalitlar,
   muddati o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan
   `sign`ga bering.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
   qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token). Bitta
   odamning ID kartasi, tokeni va kalit fayli alohida-alohida keladi: `pinfl`
   va `name` bir xil, `type` har xil.
+- `tin` va `organization` (2.6 dan) — yuridik shaxs kaliti: korxonaning STIRi
+  va nomi. Jismoniy shaxsning o'z kalitida ikkalasi `null`, shuning uchun
+  `tin` bor kalit — yuridik shaxs kaliti. `name` ikkala holda ham sertifikat
+  egasi (xodim). 2.6 dan oldin qo'shilgan ID karta va USB token kalitlarida
+  STIR saqlanmagan: ular uchun `tin` kalit qayta qo'shilguncha `null`.
 - `sign` imzo oynasini ilovangizning eng ustki ekrani ustida ochadi: domen,
   hesh va siz tanlagan kalit. Foydalanuvchi IMZOLASH'ni bosadi, parol yoki
   PIN faqat shu oynada kiritiladi. Imzodan keyin «Imzolandi» 3 soniyada o'zi
@@ -282,6 +289,46 @@ let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
 - Imzolangan hujjat ilovaga qaytmaydi: E-IMZO uni avvalgidek backend'ingizga
   yuboradi.
 
+### Kalit qo'shish (2.6.0 dan)
+
+Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
+
+```swift
+let added = await EImzoAPI.addPfxKey(pfx: data, password: password, config: config)
+// {"status":"added","key":{"id":"7a3f…","pinfl":"…","name":"…","tin":null,"organization":null,
+//   "type":"pfx","validFrom":"…","validTo":"…"}}
+
+await EImzoAPI.addQrKey(qrCode: text, password: password, config: config)
+await EImzoAPI.addIdCardKey(pin: pin, config: config)   // tizimning NFC oynasi chiqadi
+await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK token
+```
+
+- **Javobgarlik.** Bu usullarda parol, PIN va kalit fayli ilovangiz kodidan
+  o'tadi. Ular bilan nima bo'lishi uchun integrator YT bilan shartnoma
+  bo'yicha javob beradi. SDK ularni log'ga ham, xato hisobotlariga ham
+  yozmaydi.
+- ID karta: iOS kartani faqat o'z NFC oynasi orqali o'qiydi, shuning uchun bu
+  oyna baribir chiqadi; foydalanuvchi uni yopsa — `{"status":"cancelled"}`.
+  NFC sozlamalari `EImzoView`dagi ID karta uchun bilan bir xil.
+- Token: qaysi biri ulanganini (USB yoki BAIK) SDK o'zi aniqlaydi; ulanmagan
+  bo'lsa — `token_not_found`.
+- **PIN.** ID karta va USB token PIN'i — aynan 8 ta raqam (0–9). Boshqa narsa
+  (oxiriga tushib qolgan bo'sh joy, guruhlab yozilgan, bitta raqam kam yoki
+  ortiq) kartaga yuborilmaydi: darhol `wrong_pin`, «nothing was sent», urinish
+  sarflanmaydi. SDK hech narsani kesmaydi — PIN'ni foydalanuvchi kiritgandek
+  bering. BAIK token PIN'i — u qanday o'rnatilgan bo'lsa shunday.
+- `savePassword` / `savePin` standart holda `false`: hech narsa saqlanmaydi,
+  `sign` parolni yoki PIN'ni o'z oynasida so'raydi. `true` bo'lsa SDK uni
+  saqlaydi va `sign` so'ramasdan imzolaydi — buni foydalanuvchidan so'rab
+  yoqing.
+- Javob: `added` yoki `exists` — kalit `getKeys`dagi shaklda, `key.id`ni
+  `sign`ga bering. `exists` — bu kalit allaqachon bor: hech narsa o'zgarmaydi,
+  saqlangan parol yoki PIN ham. Bir vaqtda bitta qo'shish.
+- **PIN'ni siklda qayta yubormang.** SDK PIN'ni o'zi qayta urinmaydi. Har
+  noto'g'ri PIN karta yoki tokenning urinishlaridan birini oladi, oxirgisi uni
+  bloklaydi. `wrong_pin` kelsa (`triesLeft` — qolgan urinishlar, karta yoki
+  token aytsa), foydalanuvchidan PIN'ni qayta so'rang.
+
 | `code` | Qachon |
 |---|---|
 | `api_not_allowed` | «Kalitlar API» ruxsati yo'q yoki o'chirilgan |
@@ -290,8 +337,16 @@ let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
 | `invalid_request` | `deepLink` imzo so'rovi emas yoki uning sayti E-IMZO'da ro'yxatdan o'tmagan |
 | `key_not_found` | bu `id` bilan shu muhitda kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan |
-| `busy` | boshqa `sign` hali ochiq |
+| `busy` | boshqa `sign` hali ochiq yoki boshqa kalit qo'shilmoqda |
 | `sign_failed` | E-IMZO imzoni rad etdi, PIN bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
+| `wrong_password` | kalit fayli yoki QR kalitning paroli noto'g'ri |
+| `wrong_pin` | karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa) |
+| `pin_blocked` | karta yoki token PIN'i bloklangan |
+| `invalid_key` | fayl yoki QR kod kalit emas, karta E-IMZO kartasi emas, tokenda kalit yo'q yoki E-IMZO sertifikatni qabul qilmadi |
+| `nfc_unavailable` | telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |
+| `card_read_failed` | karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi |
+| `token_not_found` | token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band |
+| `add_failed` | kalit qo'shish boshqa sabab bilan tugadi |
 
 To'liq tavsif: [INTEGRATION.md, 11-bo'lim](docs/INTEGRATION.md#11-kalitlar-api).
 
