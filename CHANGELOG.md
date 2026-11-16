@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.6.1 — 2026-11-16
+
+**Fixes two crashes reported from 2.6.0.**
+
+- **QR scanner.** The camera session could start before the camera view had
+  taken it. When the two overlapped, the app stopped with an
+  `NSGenericException` ("startRunning may not be called between calls to
+  beginConfiguration and commitConfiguration"), or the main thread waited
+  on the session long enough for the system to end the app. The session now
+  starts only once the camera view holds it.
+- **Adding a key from a file.** A picked file is read up to 1 MB; key files
+  are a few kilobytes. A bigger file is not a key: no password is asked, the
+  SDK says the file cannot be opened, and the gateway hears
+  `file_too_large`.
+
+No API changes.
+
 ## 2.6.0 — 2026-11-12
 
 **New: add a key from the app's own code, with no SDK screen.** For an
