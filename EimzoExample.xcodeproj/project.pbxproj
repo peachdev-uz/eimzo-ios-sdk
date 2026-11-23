@@ -349,7 +349,7 @@
 			repositoryURL = "https://github.com/peachdev-uz/eimzo-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.6.1;
+				minimumVersion = 2.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
