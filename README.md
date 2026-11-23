@@ -274,9 +274,11 @@ let result = await EImzoAPI.sign(keyId: id, deepLink: link, config: config)
   muddati o'tganlari ham; asosiy kalit birinchi. `id`ni o'zgartirmasdan
   `sign`ga bering.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
-  qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token). Bitta
-  odamning ID kartasi, tokeni va kalit fayli alohida-alohida keladi: `pinfl`
-  va `name` bir xil, `type` har xil.
+  qo'shilgan), `id_card` (ID karta), `token` (USB token) yoki `baik_token`
+  (BAIK token; 2.7 dan, 2.5–2.6 da u ham `token` edi). Bitta odamning ID
+  kartasi, tokeni va kalit fayli alohida-alohida keladi: `pinfl` va `name`
+  bir xil, `type` har xil. Boshqa qiymat kelsa (keyingi versiyalarda yangi
+  tur qo'shilishi mumkin), uni oddiy kalit deb ko'rsating.
 - `tin` va `organization` (2.6 dan) — yuridik shaxs kaliti: korxonaning STIRi
   va nomi. Jismoniy shaxsning o'z kalitida ikkalasi `null`, shuning uchun
   `tin` bor kalit — yuridik shaxs kaliti. `name` ikkala holda ham sertifikat

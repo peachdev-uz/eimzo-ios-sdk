@@ -340,9 +340,10 @@ let json = await EImzoAPI.getKeys(config: EImzoConfig(environment: .prod))
   va USB token kalitlarida STIR saqlanmagan: ular uchun `tin` kalit qayta
   qo'shilguncha `null`.
 - `type` (2.5 dan) — kalit turi: `pfx` (kalit fayli, fayldan yoki QR koddan
-  qo'shilgan), `id_card` (ID karta) yoki `token` (USB yoki BAIK token).
-  Boshqa qiymat kelsa (keyingi versiyalarda yangi tur qo'shilishi mumkin),
-  uni oddiy kalit deb ko'rsating.
+  qo'shilgan), `id_card` (ID karta), `token` (USB token) yoki `baik_token`
+  (BAIK token; 2.7 dan, 2.5–2.6 da u ham `token` edi). Boshqa qiymat kelsa
+  (keyingi versiyalarda yangi tur qo'shilishi mumkin), uni oddiy kalit deb
+  ko'rsating.
 - `validFrom`, `validTo` — `yyyy-MM-dd` (soatsiz); SDK sanani o'qiy olmasa
   `null`.
 

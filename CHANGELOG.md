@@ -31,6 +31,12 @@ codes. `sign`, `scanAndSign` and `signQrCode` share one slot (`busy`). The
 sheet always shows the request's hash, whatever `hashDisplay` says: the
 site is on another screen, and the user compares the two.
 
+**Changed: a BAIK token is now `baik_token`.** In `getKeys` and in the key
+the `add…Key` methods return, a BAIK token's `type` is now `baik_token`; 2.5
+and 2.6 said `token`, which a USB token keeps. An app that took `token` to
+mean either kind should treat `baik_token` as a token too. A value you do not
+know is still shown as a plain key.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
