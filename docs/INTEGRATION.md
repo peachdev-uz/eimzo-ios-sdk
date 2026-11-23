@@ -76,6 +76,7 @@ Version rule: **Up to Next Major Version** dan **2.6.1**. Product:
 
 ### Camera (QR scanner)
 
+`EImzoView` skaneri va Kalitlar API'ning `scanAndSign` usuli (2.7.0) uchun.
 `Info.plist`:
 ```xml
 <key>NSCameraUsageDescription</key>
@@ -280,6 +281,10 @@ versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 2.6.0 dan — kalitni SDK oynasisiz, ilova kodidan qo'shish: `addPfxKey`,
 `addQrKey`, `addIdCardKey`, `addTokenKey` (pastda «Kalit qo'shish»).
 
+2.7.0 dan — sayt QR kodini imzolash: `scanAndSign` (SDK'ning o'z skaneri
+o'qiydi) va `signQrCode` (ilova skaneri o'qigan matn) (pastda «Sayt QR
+kodi bilan imzo»).
+
 Hammasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
 marta. Usul nomlari, JSON shakli va xato kodlari Android SDK va Flutter
 plaginida ham shunday.
@@ -425,6 +430,54 @@ default:          print(reply.code ?? "", reply.message ?? "")
 }
 ```
 
+### Sayt QR kodi bilan imzo (2.7.0 dan)
+
+Sayt imzo so'rovini E-IMZO QR kodi qilib ko'rsatadi (odatda kompyuter
+ekranida). Foydalanuvchi uni telefon bilan o'qiydi va `getKeys`dagi kalit
+bilan imzolaydi. Kodni kim o'qishiga qarab ikki usul bor:
+
+```swift
+// SDK'ning o'z skaneri o'qiydi
+let scanned = await EImzoAPI.scanAndSign(keyId: key.id, config: config)
+
+// ilovangizning o'z skaneri o'qigan matn
+let read = await EImzoAPI.signQrCode(keyId: key.id, qrCode: text, config: config)
+```
+
+Kod o'qilgach, hammasi `sign`dagidek: o'sha imzo oynasi (kalit
+almashtirilmaydi), parol yoki PIN faqat shu oynada, o'sha javoblar
+(`signed`, `cancelled`, xato) va o'sha xato kodlari. Imzodan keyin
+«Imzolandi» ekrani 3 soniyada o'zi yopiladi va usul qaytadi. Bir vaqtda
+bitta imzo ochiq bo'ladi: `sign`, `scanAndSign` va `signQrCode` bitta joyni
+bo'lishadi, boshqasi `busy` oladi.
+
+Farqi bitta: oynada hash **doim** ko'rinadi. Sayt boshqa ekranda, shuning
+uchun foydalanuvchi telefondagi hash'ni saytdagi bilan solishtiradi —
+`EImzoView` skaneri o'qigan so'rovdagidek. `hashDisplay` (12-bo'lim) faqat
+ilova o'zi yasagan so'rovlarga (`sign`, `EImzoView(deepLink:)`) ta'sir
+qiladi.
+
+**`scanAndSign`** avval tekshiradi, shu tartibda, va birinchi o'tmagan
+tekshiruv xatosini hech narsa ochmasdan qaytaradi: ruxsat, Info.plist
+(`NSCameraUsageDescription` bo'lmasa `sign_failed` — usiz iOS kamerani
+so'ragan zahoti ilovani yopib yuboradi; 3-bo'lim), kalit (`key_not_found`),
+muddati (`key_expired`), boshqa imzo ochiq emasmi (`busy`). Keyin skanerni
+butun ekranda ochadi — `EImzoView`dagi skaner: chiroq, «Kod qayerda?»
+yo'riqnomasi, kamera ruxsati so'raladi; rad etilgan bo'lsa, skaner buni
+joyida aytadi va Sozlamalarga yo'l ko'rsatadi.
+
+- Imzo so'rovi bo'lmagan kod (masalan, kalit QR kodi) — banner chiqadi,
+  skaner o'qishda davom etadi.
+- Birinchi imzo so'rovi o'qilgach skaner yopiladi va imzo oynasi ochiladi.
+- Foydalanuvchi skanerni yopsa — `{"status":"cancelled"}`.
+
+**`signQrCode`** — tekshiruvlar `sign`niki: ruxsat, so'rov (matn imzo
+so'rovining QR kodi bo'lmasa — `invalid_request`), kalit, muddati, `busy`.
+QR koddagi matnni o'zgartirmasdan bering.
+
+Gateway uchun bu oddiy Kalitlar API imzosi: chaqiruvlar `X-EImzo-Via: api`
+bilan boradi va API imzosi sifatida sanaladi.
+
 ### Kalit qo'shish (2.6.0 dan)
 
 Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
@@ -495,11 +548,11 @@ foydalanuvchidan PIN'ni qayta so'rang.
 | `api_not_allowed` | integratorda «Kalitlar API» ruxsati yo'q yoki o'chirilgan |
 | `blocked` | litsenziya tekshiruvi yoki gateway ilovani yoki qurilmani rad etdi; `message` gateway kodi bilan boshlanadi (masalan `app_blocked: …`), telefondagi litsenziya rad etilsa — `licence: …` |
 | `network` | gateway'ga ulanib bo'lmadi yoki javob kelmadi |
-| `invalid_request` | `deepLink` imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
+| `invalid_request` | `deepLink` (yoki `signQrCode`ning `qrCode`i) imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
 | `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan (SDK yoki E-IMZO aytdi) |
-| `busy` | boshqa `sign` hali ochiq yoki boshqa kalit qo'shilmoqda |
-| `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`) yoki oqim boshqa xato bilan tugadi |
+| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`) hali ochiq yoki boshqa kalit qo'shilmoqda |
+| `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`), Info.plist'da `NSCameraUsageDescription` yo'q (`scanAndSign`) yoki oqim boshqa xato bilan tugadi |
 | `wrong_password` | qo'shish: kalit fayli yoki QR kalitning paroli noto'g'ri |
 | `wrong_pin` | qo'shish: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa). PIN bo'sh yoki 8 ta raqam bo'lmasa ham — `triesLeft`siz, kartaga hech narsa yuborilmagan |
 | `pin_blocked` | qo'shish: karta yoki token PIN'i bloklangan |
@@ -553,7 +606,8 @@ let config = EImzoConfig(
 - **Til.** `language` + `showsLanguagePicker: false` — ilovaning o'z til
   tanlovi bo'lsa, joriy tilini har safar shu yerda bering.
 - **Hash.** `hashDisplay: .hidden` faqat ilova bergan so'rovga tegishli;
-  SDK skaneri o'qigan QR'da hash doim ko'rinadi.
+  QR kodda (SDK skaneri o'qigan, `scanAndSign`, `signQrCode`) hash doim
+  ko'rinadi.
 - **O'zgarmaydi:** sayt nomi, kalit egasi, «Imzolash» (rangi `primary`dan),
   PIN/parol oynasi, xato va ogohlantirish ranglari, yashil «Imzolandi»
   belgisi, kalit kartasi, QR skaner.

@@ -3,9 +3,10 @@ import EimzoSDK
 
 /// Demo screen mirroring the `eimzo_flutter` sample. Two buttons open
 /// `EImzoView` — one with no sign request (Home), the other with one made in
-/// the app from a document's values (`EImzoSignLink`). Two more show the Keys
-/// API (`EImzoAPI`): the keys the user has added to the SDK, and the same
-/// sign request signed with the one picked.
+/// the app from a document's values (`EImzoSignLink`). The rest show the Keys
+/// API (`EImzoAPI`): the keys the user has added to the SDK, the same sign
+/// request signed with the one picked, and — since 2.7.0 — a site's QR code
+/// signed with it, read by the SDK's scanner or typed in here.
 struct ContentView: View {
 
     /// What the sheet shows: the SDK, with or without a sign request.
@@ -43,6 +44,8 @@ struct ContentView: View {
     @State private var keys: [KeyList.Key] = []
     @State private var keyId: String?
     @State private var apiResult: String?
+    /// A site's QR code text, as an app's own scanner would read it.
+    @State private var qrText = ""
 
     /// The SDK's step-by-step log, in debug builds only — never ship it on.
     #if DEBUG
@@ -147,6 +150,31 @@ struct ContentView: View {
                 .controlSize(.large)
                 .disabled(keyId == nil)
 
+                // 2.7.0: a site's QR code — the SDK's scanner reads it…
+                Button {
+                    Task { await scanAndSignWithPickedKey() }
+                } label: {
+                    Label("Sayt QR kodini skanerlab imzolash", systemImage: "qrcode.viewfinder")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .disabled(keyId == nil)
+
+                // …or the app's own scanner does, and hands over the text.
+                HStack {
+                    TextField("QR kod matni", text: $qrText)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.caption.monospaced())
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                    Button("Imzolash") {
+                        Task { await signQrText() }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(keyId == nil || qrText.isEmpty)
+                }
+
                 if let apiResult {
                     ScrollView {
                         Text(apiResult)
@@ -198,6 +226,22 @@ struct ContentView: View {
     private func signWithPickedKey() async {
         guard let keyId, let link = sampleLink else { return }
         apiResult = await EImzoAPI.sign(keyId: keyId, deepLink: link, config: config)
+    }
+
+    /// `EImzoAPI.scanAndSign` (2.7.0): the SDK's scanner reads a site's QR
+    /// code, then its sign sheet signs it with the picked key — the hash
+    /// always shown, to compare with the site's. Needs
+    /// `NSCameraUsageDescription` in Info.plist, as `EImzoView`'s scanner does.
+    private func scanAndSignWithPickedKey() async {
+        guard let keyId else { return }
+        apiResult = await EImzoAPI.scanAndSign(keyId: keyId, config: config)
+    }
+
+    /// `EImzoAPI.signQrCode` (2.7.0): the text an app's own scanner read off
+    /// a site's QR code, signed with the picked key in the SDK's sheet.
+    private func signQrText() async {
+        guard let keyId else { return }
+        apiResult = await EImzoAPI.signQrCode(keyId: keyId, qrCode: qrText, config: config)
     }
 }
 

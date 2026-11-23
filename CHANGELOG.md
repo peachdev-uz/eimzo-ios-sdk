@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.7.0 — unreleased
+
+**New: sign a site's QR code.** For an integrator with the Keys API
+permission, `EImzoAPI` gains two methods that sign the E-IMZO QR code a
+site shows, with a key from `getKeys`:
+
+- `scanAndSign(keyId:config:)` — the SDK's own scanner, as in `EImzoView`
+  (torch, «Kod qayerda?», camera access handled in place), opens full
+  screen. A code that is not a sign request is named in a banner and the
+  scanner keeps looking; closing it is `cancelled`. Without
+  `NSCameraUsageDescription` in Info.plist the call answers `sign_failed`
+  and opens no camera, which iOS would end the app for.
+- `signQrCode(keyId:qrCode:config:)` — the text your own scanner read; a
+  code that is not a sign request is `invalid_request`.
+
+From there it is `sign`: the same sheet with the key fixed, the same
+results and error codes, «Imzolandi» closing after 3 seconds. No new error
+codes. `sign`, `scanAndSign` and `signQrCode` share one slot (`busy`). The
+sheet always shows the request's hash, whatever `hashDisplay` says: the
+site is on another screen, and the user compares the two.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
