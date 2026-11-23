@@ -1,6 +1,16 @@
 # Changelog
 
-## 2.7.0 — unreleased
+## 2.7.0 — 2026-11-23
+
+**New: a licence's longer term reaches the app by itself.** When YT moves a
+licence's term on, the SDK fetches the licence's new file from the YT gateway
+and keeps it: the app needs no update. The new file is checked like the one
+in the app and only extends that same licence (same bundle and Team ID); a
+kept file is replaced only by one that runs even longer. When the app's own
+file has run out, the SDK first asks the gateway for the new one (this needs
+the network) and refuses as before when there is none. A new licence put into
+the app takes precedence. Apps without a licence are not affected. SDK 2.6
+and earlier still need the new file put into the app.
 
 **New: sign a site's QR code.** For an integrator with the Keys API
 permission, `EImzoAPI` gains two methods that sign the E-IMZO QR code a

@@ -17,13 +17,13 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Dependency Rule: **Up to Next Major Version**, **2.6.1** dan.
+Dependency Rule: **Up to Next Major Version**, **2.7.0** dan.
 
 Yoki `Package.swift`'ga qo'lda qo'shing:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.6.1"),
+    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.7.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
@@ -34,7 +34,7 @@ targets: [
 
 ### Manual installation
 
-GitHub Releases'dagi `2.6.1` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
+GitHub Releases'dagi `2.7.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
 
 ## Talablar
 
@@ -60,6 +60,8 @@ App Attest faqat haqiqiy iPhone yoki iPad'da ishlaydi. iOS Simulator attestatsiy
 2.0–2.2 dagi litsenziya (`EIMZO1.…`: `eimzo-license.txt` fayli yoki `EImzoConfig(license:)`) bilan ishlayotgan ilova 2.3 da gateway sessiyasini App Attest o'rniga shu litsenziya bilan ochadi. Litsenziya gateway'da qayd etilgan bo'lishi kerak, aks holda bloklangan ekran chiqadi. Shuning uchun bunday ilovani 2.3 ga o'tkazishdan oldin `info@yt.uz`'ga yozing va YT tasdiqlaguncha 2.2 da qoling. `from: "2.2.0"` paketlar yangilanganda 2.3.0 ni ham oladi; 2.2 da qolish uchun `.upToNextMinor(from: "2.2.0")` yozing.
 
 Bekor qilingan, muddati o'tgan yoki gateway bilmaydigan litsenziyani gateway rad etadi. Bekor qilingan litsenziyalar ro'yxatini (`revoked.txt`) SDK endi o'zi yuklab olmaydi.
+
+Litsenziya muddati uzaytirilsa (2.7 dan), SDK litsenziyaning yangi faylini gateway'dan o'zi oladi va saqlaydi: ilovani yangilash shart emas. Yangi fayl ilovadagi fayl kabi tekshiriladi va faqat o'sha litsenziyaning (o'sha bundle va Team ID) muddatini uzaytiradi. Ilovadagi fayl muddati o'tgan bo'lsa, SDK avval yangisini so'raydi, buning uchun internet kerak. Ilovaga yangi litsenziya qo'yilsa, ilovadagisi ustun bo'ladi. 2.6 va undan eski SDK'larda muddat uzaytirilsa, yangi faylni ilovaga qo'yish kerak.
 
 Yangi ilova uchun litsenziya kerak emas — yuqoridagidek ro'yxatdan o'ting.
 
@@ -427,13 +429,13 @@ bilan keladi.
 4. `EImzoConfig(isTestMode:)` o'rniga `EImzoConfig(environment:)` yozing.
 5. Sheet'ni `onSignComplete`da yoping: u «Ilovaga qaytish»dan (yoki taxminan 3 soniyadan) yoki «Tayyor»dan keyin keladi.
 6. App Store Connect → App Privacy: Crash Data va Other Diagnostic Data.
-7. SPM: `from: "2.6.1"`.
+7. SPM: `from: "2.7.0"`.
 
 2.3 dan oldin qo'shilgan ID karta va USB token kalitlarida muddat noto'g'ri saqlangan va JSHSHIR yo'q. To'g'rilash uchun kalitni qayta qo'shish kerak.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.6.1"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
+Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.7.0"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
 
 Pastdagi ikkita tugma — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi va natija JSON'ini ko'rsatadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
 
