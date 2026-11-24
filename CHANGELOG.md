@@ -37,6 +37,11 @@ and 2.6 said `token`, which a USB token keeps. An app that took `token` to
 mean either kind should treat `baik_token` as a token too. A value you do not
 know is still shown as a plain key.
 
+**Android: a file that is no PFX is reported as `invalid_pfx`.** The Android
+SDK now files it as `invalid_pfx` instead of `unexpected`, as this SDK
+already does. Messages and Keys API results are unchanged; nothing changes
+on iOS.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
