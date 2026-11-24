@@ -55,6 +55,11 @@ moving away (the «Karta o'qilmadi» sheet, `card_read_failed` in the Keys
 API, `card_lost` in the report) instead of an unexpected error. Nothing
 changes on iOS.
 
+**Docs (Android): more than one app signing key.** The Android registration
+docs now say to send the SHA-256 of every app signing key certificate Play
+Console lists; Play's quantum-ready hybrid signing has three. Nothing
+changes on iOS.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
