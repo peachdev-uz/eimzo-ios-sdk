@@ -49,6 +49,12 @@ during a read, the error report now says `card_lost` instead of
 Keys API result (`card_read_failed`) are unchanged: they were already those
 of a card moved away.
 
+**Android: an ID card that answers with nothing.** When a card slips and
+answers a command with nothing, the Android SDK now treats it as the card
+moving away (the «Karta o'qilmadi» sheet, `card_read_failed` in the Keys
+API, `card_lost` in the report) instead of an unexpected error. Nothing
+changes on iOS.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
