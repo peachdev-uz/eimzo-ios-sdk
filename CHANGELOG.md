@@ -42,6 +42,13 @@ SDK now files it as `invalid_pfx` instead of `unexpected`, as this SDK
 already does. Messages and Keys API results are unchanged; nothing changes
 on iOS.
 
+**Fixed: an ID card that slips is reported as `card_lost`.** When Core NFC
+answers 102 (`readerTransceiveErrorTagResponseError`) because the card moved
+during a read, the error report now says `card_lost` instead of
+`unexpected`, as for 100, 101 and 104. The «Karta o'qilmadi» sheet and the
+Keys API result (`card_read_failed`) are unchanged: they were already those
+of a card moved away.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
