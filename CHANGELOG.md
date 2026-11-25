@@ -82,6 +82,12 @@ there. Updating the SDK keeps the keys and their passwords; only items in the
 app's own Keychain group are touched. Android is not affected: its keys and
 passwords go with the app.
 
+**Android: the add-key sheets.** In the Android SDK the password sheet's
+«Bekor qilish» broke onto two lines and was cut off at the bottom; it now
+keeps one line, and at large font sizes the two buttons stand one over the
+other. The ring of «Kalit qo‘shilmoqda» was cut off on the right and at the
+bottom; it is whole now. Nothing changes on iOS.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
