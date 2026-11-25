@@ -72,6 +72,16 @@ and card sheets when signing, the scanner giving way to the sign screen, a
 waiting sign request after a key is added, and the confirmations in Settings
 and the key list. No API changes.
 
+**Fixed: saved passwords no longer outlive the app.** iOS deletes an app's
+files when the app is removed, but not its Keychain items: the keys went,
+their saved passwords and PINs stayed, and the same key added again after a
+reinstall came back with its old password even with «Parolni saqlash» off.
+A key stored without a password now clears any left for it, and the first
+read of the keys after launch drops the saved passwords of keys no longer
+there. Updating the SDK keeps the keys and their passwords; only items in the
+app's own Keychain group are touched. Android is not affected: its keys and
+passwords go with the app.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
