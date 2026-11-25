@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.7.0 — 2026-11-23
+## 2.7.0 — 2026-11-25
 
 **New: a licence's longer term reaches the app by itself.** When YT moves a
 licence's term on, the SDK fetches the licence's new file from the YT gateway
