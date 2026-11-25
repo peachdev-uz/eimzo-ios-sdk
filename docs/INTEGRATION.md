@@ -291,7 +291,8 @@ versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 
 2.7.0 dan — sayt QR kodini imzolash: `scanAndSign` (SDK'ning o'z skaneri
 o'qiydi) va `signQrCode` (ilova skaneri o'qigan matn) (pastda «Sayt QR
-kodi bilan imzo»).
+kodi bilan imzo»), hamda SDK oynasisiz imzo: `signDirect` (pastda «Oynasiz
+imzo»).
 
 Hammasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
 marta. Usul nomlari, JSON shakli va xato kodlari Android SDK va Flutter
@@ -487,6 +488,71 @@ QR koddagi matnni o'zgartirmasdan bering.
 Gateway uchun bu oddiy Kalitlar API imzosi: chaqiruvlar `X-EImzo-Via: api`
 bilan boradi va API imzosi sifatida sanaladi.
 
+### Oynasiz imzo (2.7.0 dan)
+
+`signDirect` ilova yasagan so'rovni `getKeys`dagi kalit bilan SDK oynasini
+ochmasdan imzolaydi: imzo oynasi, parol maydoni va «Imzolandi» ekrani
+chiqmaydi.
+
+```swift
+let link = try EImzoSignLink.create(siteId: siteId, documentId: documentId, hash: hash)
+
+// parolni ilovangiz o'z ekranida so'radi
+let json = await EImzoAPI.signDirect(keyId: key.id, deepLink: link, password: password, config: config)
+
+// yoki kalit bilan saqlangan parol
+let withSaved = await EImzoAPI.signDirect(keyId: key.id, deepLink: link, config: config)
+```
+
+**Javobgarlik.** Foydalanuvchi hujjatni SDK'da ko'rmaydi: nima
+imzolanayotganini ilovangiz o'z ekranida ko'rsatadi va roziligini o'zi
+oladi. Parol yoki PIN ham ilovangiz kodidan o'tadi. Ular uchun integrator
+YT bilan shartnoma bo'yicha javob beradi — kalit qo'shish usullaridagidek.
+Ruxsat o'sha «Kalitlar API»; gateway bu imzolarni ham API imzosi sifatida
+sanaydi.
+
+- **Parol.** `password` — PFX yoki QR kalitning paroli, ID karta yoki token
+  uchun PIN. Berilmasa (`nil`), kalit bilan saqlangan parol ishlatiladi
+  (`add…Key`da `savePassword`/`savePin` bilan yoki SDK oynasidagi «Parolni
+  saqlash» bilan saqlangan). U ham bo'lmasa — `password_required`. Berilgan
+  parol saqlanmaydi. Saqlangan parolni kalit, karta yoki token rad etsa, SDK
+  uni unutadi (SDK oynasidagidek): keyingi chaqiruv `password_required`
+  oladi.
+- **PIN.** Kalit qo'shishdagi qoida: ID karta va USB token PIN'i — aynan
+  8 ta raqam, aks holda `wrong_pin` «nothing was sent», urinish
+  sarflanmaydi. BAIK token PIN'i bo'sh bo'lmasin.
+- **ID karta.** iOS kartani faqat o'z NFC oynasi orqali o'qiydi, shuning
+  uchun shu oyna chiqadi (SDK matni bilan). Oynani yopsa — `cancelled`.
+- **Token** ulangan bo'lishi kerak, aks holda `token_not_found`.
+- **Faqat ilova yasagan so'rov.** Sayt QR kodini `signQrCode` yoki
+  `scanAndSign` bilan imzolang: ular oynada sayt va hash'ni ko'rsatadi,
+  foydalanuvchi ularni saytdagisi bilan solishtiradi.
+
+**Tekshiruvlar tartibi** — birinchi o'tmagani hech narsa o'qilmasdan va
+yuborilmasdan qaytadi: ruxsat; so'rov (`invalid_request`); kalit
+(`key_not_found`); muddati (`key_expired`); parol yoki PIN
+(`password_required`, `wrong_pin`); boshqa imzo ochiq emasmi (`busy` —
+`sign`, `scanAndSign`, `signQrCode` bilan bitta joy); token ulanganmi
+(`token_not_found`) yoki telefonda NFC bormi (`nfc_unavailable`). Keyin
+E-IMZO saytni tekshiradi, kalit imzolaydi va imzo YT gateway orqali
+E-IMZO'ga ketadi — hujjatni backend'ingizga E-IMZO beradi.
+
+Javoblar:
+
+- `{"status":"signed"}` — E-IMZO imzoni qabul qildi.
+- `{"status":"cancelled"}` — ID karta: NFC oynasi yopildi.
+- `{"status":"error","code":"…","message":"…"}` — `sign`ning kodlari va:
+  `password_required`; `wrong_password`; `wrong_pin` (karta yoki token
+  aytsa, oxirida `"triesLeft":N`); `pin_blocked`; `nfc_unavailable`;
+  `card_read_failed` (karta uzoqlashdi, vaqtida tutilmadi yoki bu kalitning
+  kartasi emas); `token_not_found` (ulanmagan, sug'urildi, band yoki bu
+  kalitning tokeni emas); `network` — qayta urinsa bo'ladi. `key_expired`
+  va `sign_failed` — E-IMZO'ning imzo haqidagi qarori (`sign_failed`da
+  E-IMZO so'zlari `message`da).
+
+**PIN'ni siklda qayta yubormang** — kalit qo'shishdagidek: har noto'g'ri PIN
+karta yoki tokenning urinishlaridan birini oladi, oxirgisi uni bloklaydi.
+
 ### Kalit qo'shish (2.6.0 dan)
 
 Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
@@ -523,7 +589,8 @@ yozmaydi.
 - **Parol va PIN saqlash.** `savePassword` / `savePin` standart holda `false`:
   hech narsa saqlanmaydi va `sign` parol yoki PIN'ni o'z oynasida so'raydi.
   `true` bo'lsa SDK uni saqlaydi va `sign` so'ramasdan imzolaydi (SDK
-  oynasidagi «Parolni saqlash» kabi) — buni foydalanuvchidan so'rab yoqing.
+  oynasidagi «Parolni saqlash» kabi), `signDirect` esa parol berilmaganda
+  shuni ishlatadi — buni foydalanuvchidan so'rab yoqing.
 - **Muhit.** Kalit tanlangan muhit (`environment`, 6-bo'lim) uchun saqlanadi
   va keyin `getKeys`da chiqadi. Birinchi qo'shilgan kalit asosiy bo'ladi.
 - **Tekshiruvlar tartibi:** ruxsat; kirish (bo'sh fayl yoki QR kod —
@@ -560,15 +627,16 @@ foydalanuvchidan PIN'ni qayta so'rang.
 | `invalid_request` | `deepLink` (yoki `signQrCode`ning `qrCode`i) imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
 | `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan (SDK yoki E-IMZO aytdi) |
-| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`) hali ochiq yoki boshqa kalit qo'shilmoqda |
+| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda |
 | `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`), Info.plist'da `NSCameraUsageDescription` yo'q (`scanAndSign`) yoki oqim boshqa xato bilan tugadi |
-| `wrong_password` | qo'shish: kalit fayli yoki QR kalitning paroli noto'g'ri |
-| `wrong_pin` | qo'shish: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa). PIN bo'sh yoki 8 ta raqam bo'lmasa ham — `triesLeft`siz, kartaga hech narsa yuborilmagan |
-| `pin_blocked` | qo'shish: karta yoki token PIN'i bloklangan |
+| `password_required` | `signDirect`: parol yoki PIN berilmagan va kalit bilan saqlanmagan |
+| `wrong_password` | qo'shish va `signDirect`: kalit fayli yoki QR kalitning paroli noto'g'ri |
+| `wrong_pin` | qo'shish va `signDirect`: karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa). PIN bo'sh yoki 8 ta raqam bo'lmasa ham — `triesLeft`siz, kartaga hech narsa yuborilmagan |
+| `pin_blocked` | qo'shish va `signDirect`: karta yoki token PIN'i bloklangan |
 | `invalid_key` | qo'shish: fayl kalit fayli emas, QR kod kalit QR'i emas, karta E-IMZO kartasi emas, tokenda kalit yo'q yoki E-IMZO sertifikatni qabul qilmadi |
-| `nfc_unavailable` | qo'shish: telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |
-| `card_read_failed` | qo'shish: karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi |
-| `token_not_found` | qo'shish: token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band |
+| `nfc_unavailable` | qo'shish va `signDirect`: telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |
+| `card_read_failed` | qo'shish va `signDirect`: karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi; `signDirect`da — bu kalitning kartasi emas |
+| `token_not_found` | qo'shish va `signDirect`: token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band; `signDirect`da — bu kalitning tokeni emas |
 | `add_failed` | qo'shish boshqa sabab bilan tugadi |
 
 `message` — ishlab chiquvchi uchun inglizcha matn, foydalanuvchiga

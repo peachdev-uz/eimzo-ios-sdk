@@ -5,8 +5,9 @@ import EimzoSDK
 /// `EImzoView` — one with no sign request (Home), the other with one made in
 /// the app from a document's values (`EImzoSignLink`). The rest show the Keys
 /// API (`EImzoAPI`): the keys the user has added to the SDK, the same sign
-/// request signed with the one picked, and — since 2.7.0 — a site's QR code
-/// signed with it, read by the SDK's scanner or typed in here.
+/// request signed with the one picked — in the SDK's sheet, or since 2.7.0
+/// with no SDK screen and the password typed here — and, since 2.7.0, a
+/// site's QR code signed with it, read by the SDK's scanner or typed in here.
 struct ContentView: View {
 
     /// What the sheet shows: the SDK, with or without a sign request.
@@ -46,6 +47,9 @@ struct ContentView: View {
     @State private var apiResult: String?
     /// A site's QR code text, as an app's own scanner would read it.
     @State private var qrText = ""
+    /// The picked key's password or PIN for `signDirect`, typed in this app;
+    /// empty uses the one saved with the key.
+    @State private var password = ""
 
     /// The SDK's step-by-step log, in debug builds only — never ship it on.
     #if DEBUG
@@ -150,6 +154,20 @@ struct ContentView: View {
                 .controlSize(.large)
                 .disabled(keyId == nil)
 
+                // 2.7.0: the same request with no SDK screen — the password
+                // or PIN is typed here (empty: the one saved with the key).
+                // A real app shows the user what is signed first.
+                HStack {
+                    SecureField("Parol yoki PIN", text: $password)
+                        .textFieldStyle(.roundedBorder)
+                        .textContentType(.password)
+                    Button("Oynasiz imzolash") {
+                        Task { await signDirectWithPickedKey() }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(keyId == nil)
+                }
+
                 // 2.7.0: a site's QR code — the SDK's scanner reads it…
                 Button {
                     Task { await scanAndSignWithPickedKey() }
@@ -226,6 +244,17 @@ struct ContentView: View {
     private func signWithPickedKey() async {
         guard let keyId, let link = sampleLink else { return }
         apiResult = await EImzoAPI.sign(keyId: keyId, deepLink: link, config: config)
+    }
+
+    /// `EImzoAPI.signDirect` (2.7.0): the same sign request, signed with the
+    /// picked key and the password or PIN typed here — left empty, the one
+    /// saved with the key — with no SDK screen. The SDK shows nothing, so a
+    /// real app shows the user what is signed and asks before this call.
+    private func signDirectWithPickedKey() async {
+        guard let keyId, let link = sampleLink else { return }
+        apiResult = await EImzoAPI.signDirect(keyId: keyId, deepLink: link,
+                                              password: password.isEmpty ? nil : password,
+                                              config: config)
     }
 
     /// `EImzoAPI.scanAndSign` (2.7.0): the SDK's scanner reads a site's QR

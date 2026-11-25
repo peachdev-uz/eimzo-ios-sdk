@@ -31,6 +31,23 @@ codes. `sign`, `scanAndSign` and `signQrCode` share one slot (`busy`). The
 sheet always shows the request's hash, whatever `hashDisplay` says: the
 site is on another screen, and the user compares the two.
 
+**New: sign with no SDK screen.** `EImzoAPI.signDirect(keyId:deepLink:password:config:)`
+signs a request your app made with a key from `getKeys`, with no SDK sheet:
+your app shows what is signed, takes the user's consent and, as for the add
+methods, hands over the password or PIN — your company answers for both
+under its contract with YT. `password` is the key file's password or the ID
+card's or token's PIN; without it the SDK signs with the one saved with the
+key, and with none saved answers `password_required` (a new code). A
+password given is never saved; a saved one the key, card or token refuses is
+forgotten. Every kind of key: an ID card brings up only the system's NFC
+sheet, a token must be plugged in, and the PIN rules are the add methods'.
+Errors are `sign`'s codes plus the add methods' `wrong_password`,
+`wrong_pin` (with `triesLeft`), `pin_blocked`, `nfc_unavailable`,
+`card_read_failed` and `token_not_found`. One sign at a time with `sign`,
+`scanAndSign` and `signQrCode` (`busy`). Only for a request your app made: a
+site's QR code is signed in the sheet, which shows the site and the hash.
+Same Keys API permission; `sign` is unchanged.
+
 **Changed: a BAIK token is now `baik_token`.** In `getKeys` and in the key
 the `add…Key` methods return, a BAIK token's `type` is now `baik_token`; 2.5
 and 2.6 said `token`, which a USB token keeps. An app that took `token` to

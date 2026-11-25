@@ -4,7 +4,7 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 
 - **iOS 16+** • **Swift 5.9+** • **SwiftUI**
 - Hammasi bir SwiftUI view'da: `EImzoView`. Host'ingiz uni sheet sifatida present qiladi va imzo natijasini callback orqali oladi.
-- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham.
+- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham; 2.7.0 dan — SDK oynasisiz imzo ham (`signDirect`).
 - SDK E-IMZO bilan YT gateway orqali ishlaydi, shuning uchun ilovangiz ro'yxatdan o'tgan bo'lishi kerak (pastda «Ro'yxatdan o'tish»).
 
 ## O'rnatish
@@ -247,8 +247,8 @@ sababini konsolga yozadi.
 qo'shgan kalitlar ro'yxatini beradi, `EImzoAPI.sign` esa ulardan biri bilan
 SDK'ning o'z imzo oynasi orqali imzolaydi. 2.6.0 dan ilova kalitni o'zi ham
 qo'sha oladi (pastda «Kalit qo'shish»), 2.7.0 dan sayt QR kodini ham
-imzolaydi (pastda «Sayt QR kodi bilan imzo»). Hammasi JSON (`String`)
-qaytaradi.
+imzolaydi (pastda «Sayt QR kodi bilan imzo») va SDK oynasini ochmasdan ham
+imzolay oladi (pastda «Oynasiz imzo»). Hammasi JSON (`String`) qaytaradi.
 
 Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi: ruxsatni
 `info@yt.uz` orqali so'rang, u shartnomadan keyin beriladi va
@@ -323,6 +323,36 @@ let read = await EImzoAPI.signQrCode(keyId: id, qrCode: text, config: config)
 - `signQrCode`: matn imzo so'rovining QR kodi bo'lmasa (masalan, kalit QR
   kodi) — `invalid_request`.
 
+### Oynasiz imzo (2.7.0 dan)
+
+`signDirect` ilova yasagan so'rovni tanlangan kalit bilan SDK oynasini
+ochmasdan imzolaydi. Parolni (yoki PIN'ni) ilovangiz o'z ekranida so'raydi:
+
+```swift
+let result = await EImzoAPI.signDirect(keyId: id, deepLink: link, password: password, config: config)
+// {"status":"signed"} · {"status":"error","code":"wrong_password","message":"…"}
+
+// parolsiz — kalit bilan saqlangan parol ishlatiladi
+let withSaved = await EImzoAPI.signDirect(keyId: id, deepLink: link, config: config)
+```
+
+- **Javobgarlik.** Foydalanuvchi hujjatni SDK'da ko'rmaydi: nima
+  imzolanayotganini ilovangiz o'zi ko'rsatadi va roziligini o'zi oladi.
+  Parol yoki PIN ilovangiz kodidan o'tadi. Ular uchun integrator YT bilan
+  shartnoma bo'yicha javob beradi (kalit qo'shishdagidek).
+- `password` — kalit fayli paroli yoki ID karta / token PIN'i. Berilmasa,
+  kalit bilan saqlangan parol ishlatiladi; u ham bo'lmasa —
+  `password_required`. Berilgan parol saqlanmaydi. Saqlangan parol rad
+  etilsa, SDK uni unutadi.
+- PIN qoidalari kalit qo'shishdagidek (ID karta va USB token — 8 ta raqam).
+  ID karta uchun tizimning NFC oynasi chiqadi; yopilsa — `cancelled`.
+- Faqat ilova yasagan so'rov: sayt QR kodini `signQrCode` yoki
+  `scanAndSign` bilan imzolang — ular sayt va hash'ni ko'rsatadi.
+- Javob: `signed`, `cancelled` (faqat ID karta) yoki xato — `sign`ning
+  kodlari va `password_required`, `wrong_password`, `wrong_pin`
+  (`triesLeft`), `pin_blocked`, `nfc_unavailable`, `card_read_failed`,
+  `token_not_found`. Bir vaqtda bitta imzo (`busy`).
+
 ### Kalit qo'shish (2.6.0 dan)
 
 Ilova kalitni SDK oynasini ochmasdan, o'z kodidan qo'shadi:
@@ -353,8 +383,8 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
   bering. BAIK token PIN'i — u qanday o'rnatilgan bo'lsa shunday.
 - `savePassword` / `savePin` standart holda `false`: hech narsa saqlanmaydi,
   `sign` parolni yoki PIN'ni o'z oynasida so'raydi. `true` bo'lsa SDK uni
-  saqlaydi va `sign` so'ramasdan imzolaydi — buni foydalanuvchidan so'rab
-  yoqing.
+  saqlaydi va `sign` so'ramasdan imzolaydi, `signDirect` esa parol
+  berilmaganda shuni ishlatadi — buni foydalanuvchidan so'rab yoqing.
 - Javob: `added` yoki `exists` — kalit `getKeys`dagi shaklda, `key.id`ni
   `sign`ga bering. `exists` — bu kalit allaqachon bor: hech narsa o'zgarmaydi,
   saqlangan parol yoki PIN ham. Bir vaqtda bitta qo'shish.
@@ -371,15 +401,16 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
 | `invalid_request` | `deepLink` yoki `qrCode` imzo so'rovi emas yoki uning sayti E-IMZO'da ro'yxatdan o'tmagan |
 | `key_not_found` | bu `id` bilan shu muhitda kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan |
-| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`) hali ochiq yoki boshqa kalit qo'shilmoqda |
+| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda |
 | `sign_failed` | E-IMZO imzoni rad etdi, PIN bloklandi (`message`: `pin_blocked`), Info.plist'da `NSCameraUsageDescription` yo'q (`scanAndSign`) yoki oqim boshqa xato bilan tugadi |
+| `password_required` | `signDirect`: parol yoki PIN berilmagan va saqlanmagan |
 | `wrong_password` | kalit fayli yoki QR kalitning paroli noto'g'ri |
 | `wrong_pin` | karta yoki token PIN'i noto'g'ri; `triesLeft` — qolgan urinishlar (karta yoki token aytsa) |
 | `pin_blocked` | karta yoki token PIN'i bloklangan |
 | `invalid_key` | fayl yoki QR kod kalit emas, karta E-IMZO kartasi emas, tokenda kalit yo'q yoki E-IMZO sertifikatni qabul qilmadi |
 | `nfc_unavailable` | telefonda NFC yo'q, o'chiq yoki ilovaga ruxsat berilmagan |
-| `card_read_failed` | karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi |
-| `token_not_found` | token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band |
+| `card_read_failed` | karta o'qib bo'lingunicha uzoqlashdi, vaqtida tutilmadi yoki (`signDirect`) bu kalitning kartasi emas |
+| `token_not_found` | token ulanmagan, sug'urib olindi, unga ruxsat berilmadi, u band yoki (`signDirect`) bu kalitning tokeni emas |
 | `add_failed` | kalit qo'shish boshqa sabab bilan tugadi |
 
 To'liq tavsif: [INTEGRATION.md, 11-bo'lim](docs/INTEGRATION.md#11-kalitlar-api).
@@ -439,7 +470,7 @@ bilan keladi.
 
 Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.7.0"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
 
-Pastdagi ikkita tugma — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi va natija JSON'ini ko'rsatadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
+Pastdagi tugmalar — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi. «Oynasiz imzolash» (2.7.0) o'sha so'rovni shu kalit va maydonga yozilgan parol yoki PIN bilan (bo'sh bo'lsa — kalit bilan saqlangani) `EImzoAPI.signDirect` orqali, SDK oynasisiz imzolaydi. «Sayt QR kodini skanerlab imzolash» va QR matni maydoni (2.7.0) — `EImzoAPI.scanAndSign` va `EImzoAPI.signQrCode`. Har birining natija JSON'i ekranda ko'rinadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
 
 Ishga tushirish: `EimzoExample.xcodeproj`ni oching, Signing & Capabilities'da Team'ingizni tanlang va bundle ID'ni o'zingiznikiga almashtiring. Shu bundle ID va Team ID ro'yxatdan o'tgan bo'lishi kerak (yuqoridagi «Ro'yxatdan o'tish»), aks holda SDK bloklangan ekranni ko'rsatadi, Kalitlar API esa `blocked` qaytaradi. Ilovani haqiqiy iPhone'da sinang: iOS Simulator'da App Attest ishlamaydi, u yerda ham shunday bo'ladi.
 
