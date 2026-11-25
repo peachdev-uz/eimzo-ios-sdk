@@ -60,6 +60,18 @@ docs now say to send the SHA-256 of every app signing key certificate Play
 Console lists; Play's quantum-ready hybrid signing has three. Nothing
 changes on iOS.
 
+**Fixed: a crash on iOS 16 when adding a key.** On iOS 16 (an iPhone 8 with
+iOS 16.7) the app could close right after a key file's or QR key's password
+was confirmed; the key itself was saved. The SDK put one sheet in place of
+another at once (the password, then «Kalit qo‘shilmoqda», then the password
+again with the reason), and iOS 16 throws when a sheet is presented while
+the one before it is still going away. «Kalit qo‘shilmoqda» and a wrong
+password or token PIN are now shown in the same sheet, and every other sheet
+opens only once the one before it is down: the add-key routes, the password
+and card sheets when signing, the scanner giving way to the sign screen, a
+waiting sign request after a key is added, and the confirmations in Settings
+and the key list. No API changes.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
