@@ -54,6 +54,13 @@ and 2.6 said `token`, which a USB token keeps. An app that took `token` to
 mean either kind should treat `baik_token` as a token too. A value you do not
 know is still shown as a plain key.
 
+**Android: an E-IMZO answer with no message no longer fails a signature.**
+When `pki.send_pkcs7` answered without a `message`, or with `null`, the
+Android SDK crashed reading it, and a signature E-IMZO had taken was reported
+as an unknown error. It now reads such an answer: `send.success` is signed, a
+refusal is reported in E-IMZO's words, an answer with no state is unknown.
+This SDK already read them; nothing changes on iOS.
+
 **Android: a file that is no PFX is reported as `invalid_pfx`.** The Android
 SDK now files it as `invalid_pfx` instead of `unexpected`, as this SDK
 already does. Messages and Keys API results are unchanged; nothing changes
