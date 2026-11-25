@@ -88,6 +88,18 @@ keeps one line, and at large font sizes the two buttons stand one over the
 other. The ring of «Kalit qo‘shilmoqda» was cut off on the right and at the
 bottom; it is whole now. Nothing changes on iOS.
 
+**Fixed: the SDK's screens stayed dark after the QR scanner.** Once the
+scanner for adding a key by QR closed (with ✕ or after reading a key), the
+SDK's screens — Home, the add-key sheet, the password sheet and its
+keyboard — stayed dark with the phone in light mode, until the SDK was
+closed and opened again. The scanner made itself dark with
+`preferredColorScheme`, which SwiftUI also put on the SDK's sheet the
+scanner was opened from, and never took off. Now only the scanner's own
+screen is dark: the scanner and «Kod qayerda?» look as before, and once it
+closes every screen is back in the phone's mode, or in the one the app sets
+with `themeMode`. The `scanAndSign` scanner's status bar is now white too
+(it was dark). No API changes. Android is not affected.
+
 ## 2.6.1 — 2026-11-16
 
 **Fixes two crashes reported from 2.6.0.**
