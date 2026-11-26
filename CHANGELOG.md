@@ -1,5 +1,22 @@
 # Changelog
 
+## Next version (unreleased)
+
+**New: delete a key.** For an integrator with the Keys API permission,
+`EImzoAPI.deleteKey(keyId:config:)` deletes a key from `getKeys` from the SDK
+on this phone, with no SDK screen — the app asks its user first, on its own
+screen, and the integrator answers for that under its contract with YT, as
+for the add methods. The key's entry and the password or PIN saved with it
+go, for every kind of key alike; an ID card or a token is not touched, nor
+needed, and the certificate is not revoked, so the key can be added again.
+When the key was the default, another becomes the default by the SDK's own
+rule, and `getKeys` lists it first. It answers
+`{"status":"deleted","key":{…}}` — the deleted key as `getKeys` listed it —
+or an error: `key_not_found` (a key `getKeys` does not list), `busy` (a sign
+with this key is still open), `delete_failed` (new: the key store could not
+be read or changed) and the usual `api_not_allowed`, `blocked`, `network`.
+Only the permission check goes to the gateway.
+
 ## 2.7.0 — 2026-11-25
 
 **New: a licence's longer term reaches the app by itself.** When YT moves a
