@@ -4,7 +4,7 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 
 - **iOS 16+** • **Swift 5.9+** • **SwiftUI**
 - Hammasi bir SwiftUI view'da: `EImzoView`. Host'ingiz uni sheet sifatida present qiladi va imzo natijasini callback orqali oladi.
-- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham; 2.7.0 dan — SDK oynasisiz imzo ham (`signDirect`).
+- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham; 2.7.0 dan — SDK oynasisiz imzo ham (`signDirect`); kalitni o'chirish ham (`deleteKey`).
 - SDK E-IMZO bilan YT gateway orqali ishlaydi, shuning uchun ilovangiz ro'yxatdan o'tgan bo'lishi kerak (pastda «Ro'yxatdan o'tish»).
 
 ## O'rnatish
@@ -248,7 +248,8 @@ qo'shgan kalitlar ro'yxatini beradi, `EImzoAPI.sign` esa ulardan biri bilan
 SDK'ning o'z imzo oynasi orqali imzolaydi. 2.6.0 dan ilova kalitni o'zi ham
 qo'sha oladi (pastda «Kalit qo'shish»), 2.7.0 dan sayt QR kodini ham
 imzolaydi (pastda «Sayt QR kodi bilan imzo») va SDK oynasini ochmasdan ham
-imzolay oladi (pastda «Oynasiz imzo»). Hammasi JSON (`String`) qaytaradi.
+imzolay oladi (pastda «Oynasiz imzo»). Ilova kalitni o'chira ham oladi
+(pastda «Kalitni o'chirish»). Hammasi JSON (`String`) qaytaradi.
 
 Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi: ruxsatni
 `info@yt.uz` orqali so'rang, u shartnomadan keyin beriladi va
@@ -393,6 +394,38 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
   bloklaydi. `wrong_pin` kelsa (`triesLeft` — qolgan urinishlar, karta yoki
   token aytsa), foydalanuvchidan PIN'ni qayta so'rang.
 
+### Kalitni o'chirish
+
+`deleteKey` `getKeys`dagi kalitni telefondagi SDK'dan SDK oynasini ochmasdan
+o'chiradi — `EImzoView` kalitlar ro'yxatidagi o'chirish kabi, lekin
+tasdiqlash oynasisiz:
+
+```swift
+// Foydalanuvchi ilovaning o'z ekranida «Ha» degandan keyin.
+let deleted = await EImzoAPI.deleteKey(keyId: id, config: config)
+// {"status":"deleted","key":{"id":"7a3f…",…}} ·
+// {"status":"error","code":"key_not_found","message":"…"}
+```
+
+- **So'rash — ilovada.** SDK hech narsa ko'rsatmaydi va so'ramaydi:
+  foydalanuvchidan ilovangiz o'zi so'raydi. Buning uchun integrator YT bilan
+  shartnoma bo'yicha javob beradi (kalit qo'shishdagidek).
+- **Nima o'chadi:** SDK'dagi kalit yozuvi va unga saqlangan parol yoki PIN —
+  barcha kalit turlarida bir xil. ID karta yoki tokenning o'ziga tegilmaydi,
+  ular kerak ham emas; sertifikat bekor qilinmaydi — kalitni keyin qayta
+  qo'shish mumkin.
+- **Asosiy kalit** o'chirilsa, SDK o'z qoidasi bilan boshqasini asosiy qiladi
+  (`EImzoView` ro'yxatidagi o'chirishdagidek) va `getKeys` uni birinchi beradi.
+- **Tekshiruvlar tartibi:** ruxsat (`api_not_allowed`, `blocked`, `network`);
+  kalit shu yerda (`key_not_found` — `getKeys` bermaydigan kalit, boshqa
+  muhitda qo'shilgani ham); shu kalit bilan imzo ochiq emas (`busy` —
+  `sign`, `signQrCode`, `scanAndSign` yoki `signDirect` javob berguncha
+  kuting). Gateway'ga faqat ruxsat tekshiruvi boradi.
+- Javob: `deleted` — o'chgan kalit `getKeys`dagi shaklda; kalitlar ombori
+  o'qilmasa yoki o'zgarmasa — `delete_failed`.
+
+### Xato kodlari
+
 | `code` | Qachon |
 |---|---|
 | `api_not_allowed` | «Kalitlar API» ruxsati yo'q yoki o'chirilgan |
@@ -401,7 +434,7 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
 | `invalid_request` | `deepLink` yoki `qrCode` imzo so'rovi emas yoki uning sayti E-IMZO'da ro'yxatdan o'tmagan |
 | `key_not_found` | bu `id` bilan shu muhitda kalit yo'q |
 | `key_expired` | kalit sertifikati muddati tugagan |
-| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda |
+| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda; `deleteKey`da — shu kalit bilan imzo hali ochiq |
 | `sign_failed` | E-IMZO imzoni rad etdi, PIN bloklandi (`message`: `pin_blocked`), Info.plist'da `NSCameraUsageDescription` yo'q (`scanAndSign`) yoki oqim boshqa xato bilan tugadi |
 | `password_required` | `signDirect`: parol yoki PIN berilmagan va saqlanmagan |
 | `wrong_password` | kalit fayli yoki QR kalitning paroli noto'g'ri |
@@ -412,6 +445,7 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
 | `card_read_failed` | karta o'qib bo'lingunicha uzoqlashdi, vaqtida tutilmadi yoki (`signDirect`) bu kalitning kartasi emas |
 | `token_not_found` | token ulanmagan, sug'urib olindi, unga ruxsat berilmadi, u band yoki (`signDirect`) bu kalitning tokeni emas |
 | `add_failed` | kalit qo'shish boshqa sabab bilan tugadi |
+| `delete_failed` | `deleteKey`: SDK'ning kalitlar ombori o'qilmadi yoki kalit o'chmadi |
 
 To'liq tavsif: [INTEGRATION.md, 11-bo'lim](docs/INTEGRATION.md#11-kalitlar-api).
 

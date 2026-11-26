@@ -294,6 +294,9 @@ o'qiydi) va `signQrCode` (ilova skaneri o'qigan matn) (pastda «Sayt QR
 kodi bilan imzo»), hamda SDK oynasisiz imzo: `signDirect` (pastda «Oynasiz
 imzo»).
 
+Ilova kalitni SDK oynasisiz o'chira ham oladi: `deleteKey` (pastda «Kalitni
+o'chirish»).
+
 Hammasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
 marta. Usul nomlari, JSON shakli va xato kodlari Android SDK va Flutter
 plaginida ham shunday.
@@ -617,6 +620,46 @@ noto'g'ri PIN karta yoki tokenning urinishlaridan birini oladi, oxirgisi uni
 bloklaydi (`pin_blocked`). `wrong_pin` kelsa, `triesLeft`ni ko'rsatib
 foydalanuvchidan PIN'ni qayta so'rang.
 
+### Kalitni o'chirish
+
+`deleteKey(keyId:config:)` `getKeys`dagi kalitni telefondagi SDK'dan SDK
+oynasini ochmasdan o'chiradi — `EImzoView` kalitlar ro'yxatidagi o'chirish
+kabi, lekin tasdiqlash oynasisiz.
+
+```swift
+// Foydalanuvchi ilovaning o'z ekranida «Ha» degandan keyin.
+let json = await EImzoAPI.deleteKey(keyId: key.id, config: config)
+```
+
+**So'rash — ilovada.** SDK hech narsa ko'rsatmaydi va so'ramaydi:
+foydalanuvchidan «Kalit o'chirilsinmi?» deb ilovangiz o'zi so'raydi. Buning
+uchun integrator YT bilan shartnoma bo'yicha javob beradi, kalit
+qo'shishdagidek.
+
+- **Nima o'chadi.** SDK'dagi kalit yozuvi va unga saqlangan parol yoki PIN
+  (Keychain'dagisi ham) — PFX, QR, ID karta, USB va BAIK token kalitlarida
+  bir xil. ID karta yoki tokenning o'ziga tegilmaydi; ular ham, PIN ham
+  kerak emas. Sertifikat bekor qilinmaydi: kalitni keyin `add…` usullari
+  yoki `EImzoView` bilan qayta qo'shish mumkin.
+- **Asosiy kalit.** O'chirilgan kalit asosiy bo'lsa, SDK o'z qoidasi bilan
+  boshqasini (saqlanganlarning birinchisini) asosiy qiladi — `EImzoView`
+  ro'yxatidagi o'chirishdagidek; `getKeys` uni birinchi beradi.
+- **Tekshiruvlar tartibi** (har biri hech narsa o'chirmasdan xato qaytaradi):
+  ruxsat (`api_not_allowed`, `blocked`, `network`); kalit shu yerda
+  (`key_not_found` — `getKeys` bermaydigan kalit, boshqa muhitda qo'shilgani
+  ham; muddati o'tgani o'chadi); shu kalit bilan imzo ochiq emas (`busy` —
+  `sign`, `signQrCode`, `scanAndSign` yoki `signDirect` javob berguncha
+  kuting). Keyin kalit o'chadi. Gateway'ga faqat ruxsat tekshiruvi boradi;
+  o'chirish xato bilan tugasa, `EImzoView`dagidek xato hisoboti ketadi.
+
+Javoblar:
+
+- `{"status":"deleted","key":{"id":…,"pinfl":…,"name":…,"tin":…,"organization":…,"type":…,"validFrom":…,"validTo":…}}`
+  — kalit o'chdi; `key` — o'chgan kalit, `getKeys` bergandek.
+- `{"status":"error","code":"…","message":"…"}` — yuqoridagi kodlar yoki
+  `delete_failed`: SDK kalitlar omborini o'qiy olmadi yoki kalitni o'chira
+  olmadi (`message`da sababning turi).
+
 ### Xato kodlari
 
 | `code` | Qachon |
@@ -625,9 +668,9 @@ foydalanuvchidan PIN'ni qayta so'rang.
 | `blocked` | litsenziya tekshiruvi yoki gateway ilovani yoki qurilmani rad etdi; `message` gateway kodi bilan boshlanadi (masalan `app_blocked: …`), telefondagi litsenziya rad etilsa — `licence: …` |
 | `network` | gateway'ga ulanib bo'lmadi yoki javob kelmadi |
 | `invalid_request` | `deepLink` (yoki `signQrCode`ning `qrCode`i) imzo so'rovi emas yoki E-IMZO uning saytini ro'yxatdan o'tmagan dedi |
-| `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q |
+| `key_not_found` | bu `id` bilan shu muhitda ishlatsa bo'ladigan kalit yo'q (`deleteKey`: `getKeys` bermaydigan kalit) |
 | `key_expired` | kalit sertifikati muddati tugagan (SDK yoki E-IMZO aytdi) |
-| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda |
+| `busy` | boshqa imzo (`sign`, `scanAndSign`, `signQrCode`, `signDirect`) hali ochiq yoki boshqa kalit qo'shilmoqda; `deleteKey`da — shu kalit bilan imzo hali ochiq |
 | `sign_failed` | E-IMZO imzoni rad etdi (so'zlari `message`da), karta yoki token PIN'i bloklandi (`message`: `pin_blocked`), Info.plist'da `NSCameraUsageDescription` yo'q (`scanAndSign`) yoki oqim boshqa xato bilan tugadi |
 | `password_required` | `signDirect`: parol yoki PIN berilmagan va kalit bilan saqlanmagan |
 | `wrong_password` | qo'shish va `signDirect`: kalit fayli yoki QR kalitning paroli noto'g'ri |
@@ -638,6 +681,7 @@ foydalanuvchidan PIN'ni qayta so'rang.
 | `card_read_failed` | qo'shish va `signDirect`: karta o'qib bo'lingunicha uzoqlashdi yoki vaqtida tutilmadi; `signDirect`da — bu kalitning kartasi emas |
 | `token_not_found` | qo'shish va `signDirect`: token ulanmagan, sug'urib olindi, unga ruxsat berilmadi yoki u band; `signDirect`da — bu kalitning tokeni emas |
 | `add_failed` | qo'shish boshqa sabab bilan tugadi |
+| `delete_failed` | `deleteKey`: SDK'ning kalitlar ombori o'qilmadi yoki kalit o'chmadi |
 
 `message` — ishlab chiquvchi uchun inglizcha matn, foydalanuvchiga
 ko'rsatish uchun emas; unda kalit, parol yoki hesh bo'lmaydi. Android'dagi
