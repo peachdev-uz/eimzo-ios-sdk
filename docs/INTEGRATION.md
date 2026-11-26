@@ -65,13 +65,13 @@ Xcode → File → Add Package Dependencies → URL:
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Version rule: **Up to Next Major Version** dan **2.7.0**. Product:
+Version rule: **Up to Next Major Version** dan **2.8.0**. Product:
 `EimzoSDK`.
 
 `Package.swift`da:
 
 ```swift
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.7.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.8.0")
 // target'da:
 .product(name: "EimzoSDK", package: "eimzo-ios-sdk")
 ```
@@ -271,10 +271,10 @@ narsa bo'lsa, shu yerda yoziladi. Bu minor versiyada ham bo'lishi mumkin:
 2.3.0 dan ilova ro'yxatdan o'tgan bo'lishi kerak.
 
 ```
-.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.7.0")
+.package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.8.0")
 ```
 
-`from: "2.7.0"` semantic versioning bo'yicha 2.7.0 va undan yangi 2.x
+`from: "2.8.0"` semantic versioning bo'yicha 2.8.0 va undan yangi 2.x
 versiyalarni qabul qiladi, 3.0.0 ni olmaydi.
 
 ## 11. Kalitlar API
@@ -294,7 +294,7 @@ o'qiydi) va `signQrCode` (ilova skaneri o'qigan matn) (pastda «Sayt QR
 kodi bilan imzo»), hamda SDK oynasisiz imzo: `signDirect` (pastda «Oynasiz
 imzo»).
 
-Ilova kalitni SDK oynasisiz o'chira ham oladi: `deleteKey` (pastda «Kalitni
+2.8.0 dan — kalitni SDK oynasisiz o'chirish: `deleteKey` (pastda «Kalitni
 o'chirish»).
 
 Hammasi `async`, JSON'ni `String` qilib qaytaradi — main actor'da, bir
@@ -620,7 +620,7 @@ noto'g'ri PIN karta yoki tokenning urinishlaridan birini oladi, oxirgisi uni
 bloklaydi (`pin_blocked`). `wrong_pin` kelsa, `triesLeft`ni ko'rsatib
 foydalanuvchidan PIN'ni qayta so'rang.
 
-### Kalitni o'chirish
+### Kalitni o'chirish (2.8.0 dan)
 
 `deleteKey(keyId:config:)` `getKeys`dagi kalitni telefondagi SDK'dan SDK
 oynasini ochmasdan o'chiradi — `EImzoView` kalitlar ro'yxatidagi o'chirish

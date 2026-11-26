@@ -25,12 +25,13 @@ SDK_PACKAGE_URL = 'https://github.com/peachdev-uz/eimzo-ios-sdk'
 # `EImzoSignLink`, `EImzoConfig(environment:)` and signing through the YT
 # gateway came in 2.3.0, the Keys API (`EImzoAPI`) in 2.4.0, its QR code
 # signing (`scanAndSign`, `signQrCode`) in 2.7.0, which the example uses.
-# SPM resolves to the highest 2.x tag.
-SDK_MIN_VERSION = '2.7.0'
+# 2.8.0 is one binary target (no Pfx2qr). SPM resolves to the highest 2.x
+# tag.
+SDK_MIN_VERSION = '2.8.0'
 # Example app's own version. Bump this in lockstep with the SDK on every
 # release so the displayed CFBundleShortVersionString matches the tag a
 # consumer is looking at.
-EXAMPLE_VERSION = '2.7.0'
+EXAMPLE_VERSION = '2.8.0'
 
 FileUtils.rm_rf(PROJ_PATH)
 project = Xcodeproj::Project.new(PROJ_PATH)

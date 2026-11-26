@@ -1,6 +1,22 @@
 # Changelog
 
-## Next version (unreleased)
+## 2.8.0 — 2026-11-26
+
+**Changed: one framework, no Go.** A PFX key file is now read by Swift code
+inside `EimzoSDK`, not by Go's `Pfx2qr.xcframework`, which is gone. The
+release has one zip, `EimzoSDK.xcframework.zip` (4.8 MB; 2.7.0 had 8.5 MB
+plus 7.7 MB for Pfx2qr), and the SDK's binary in an app is about half the
+size. With Swift Package Manager, or CocoaPods through the Flutter plugin,
+there is nothing to do. If you added the frameworks by hand, remove
+`Pfx2qr.xcframework` from your project when you update:
+[MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md). The key made from a
+file is byte for byte the one Go made, so stored keys and signing are
+unchanged, and so are the error codes (`wrong_password`, `invalid_pfx`).
+Valid files Go refused now open: BER encoding, an unencrypted key bag, more
+than two containers, a password with a character outside the BMP (an
+emoji). A key on the XchA curve, which Go's converter crashed on, is refused
+as `invalid_pfx`. The privacy manifest no longer declares the file
+timestamp API (C617.1): only Go's runtime used it.
 
 **New: delete a key.** For an integrator with the Keys API permission,
 `EImzoAPI.deleteKey(keyId:config:)` deletes a key from `getKeys` from the SDK
@@ -16,6 +32,13 @@ or an error: `key_not_found` (a key `getKeys` does not list), `busy` (a sign
 with this key is still open), `delete_failed` (new: the key store could not
 be read or changed) and the usual `api_not_allowed`, `blocked`, `network`.
 Only the permission check goes to the gateway.
+
+**Android: no Go either, and a crash fixed.** The Android SDK reads a PFX
+file in Kotlin now and ships without `libgojni.so`: its AAR went from
+12.9 MB to about 3 MB. An app that carries a Go library of its own
+(Flutter's `fast_rsa` package, for one) closed without a trace seconds after
+the SDK's screen opened, because one Android process cannot run two Go
+runtimes; that is fixed. Nothing of the kind was seen on iOS.
 
 ## 2.7.0 — 2026-11-25
 

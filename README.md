@@ -4,7 +4,7 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 
 - **iOS 16+** • **Swift 5.9+** • **SwiftUI**
 - Hammasi bir SwiftUI view'da: `EImzoView`. Host'ingiz uni sheet sifatida present qiladi va imzo natijasini callback orqali oladi.
-- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham; 2.7.0 dan — SDK oynasisiz imzo ham (`signDirect`); kalitni o'chirish ham (`deleteKey`).
+- 2.4.0 dan, ruxsat berilgan integrator uchun: kalitlar ro'yxati va SDK oynasi orqali imzo — `EImzoAPI` (pastda «Kalitlar API»); 2.6.0 dan — SDK oynasisiz kalit qo'shish ham; 2.7.0 dan — SDK oynasisiz imzo ham (`signDirect`); 2.8.0 dan — kalitni o'chirish ham (`deleteKey`).
 - SDK E-IMZO bilan YT gateway orqali ishlaydi, shuning uchun ilovangiz ro'yxatdan o'tgan bo'lishi kerak (pastda «Ro'yxatdan o'tish»).
 
 ## O'rnatish
@@ -17,13 +17,13 @@ E-IMZO mobil imzolash SDK'si iOS uchun. SwiftUI-based, native crypto (OzDST 1092
 https://github.com/peachdev-uz/eimzo-ios-sdk
 ```
 
-Dependency Rule: **Up to Next Major Version**, **2.7.0** dan.
+Dependency Rule: **Up to Next Major Version**, **2.8.0** dan.
 
 Yoki `Package.swift`'ga qo'lda qo'shing:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.7.0"),
+    .package(url: "https://github.com/peachdev-uz/eimzo-ios-sdk", from: "2.8.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
@@ -34,7 +34,7 @@ targets: [
 
 ### Manual installation
 
-GitHub Releases'dagi `2.7.0` release'dan `EimzoSDK.xcframework.zip` va `Pfx2qr.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md).
+GitHub Releases'dagi `2.8.0` release'dan `EimzoSDK.xcframework.zip`'ni yuklab olib, Xcode'ga qo'shing: [MANUAL_INSTALLATION.md](docs/MANUAL_INSTALLATION.md). 2.8.0 dan fayl bitta: `Pfx2qr.xcframework` endi kerak emas.
 
 ## Talablar
 
@@ -248,7 +248,7 @@ qo'shgan kalitlar ro'yxatini beradi, `EImzoAPI.sign` esa ulardan biri bilan
 SDK'ning o'z imzo oynasi orqali imzolaydi. 2.6.0 dan ilova kalitni o'zi ham
 qo'sha oladi (pastda «Kalit qo'shish»), 2.7.0 dan sayt QR kodini ham
 imzolaydi (pastda «Sayt QR kodi bilan imzo») va SDK oynasini ochmasdan ham
-imzolay oladi (pastda «Oynasiz imzo»). Ilova kalitni o'chira ham oladi
+imzolay oladi (pastda «Oynasiz imzo»), 2.8.0 dan kalitni o'chira ham oladi
 (pastda «Kalitni o'chirish»). Hammasi JSON (`String`) qaytaradi.
 
 Kalitlar API faqat YT ruxsat bergan integratorda ishlaydi: ruxsatni
@@ -394,7 +394,7 @@ await EImzoAPI.addTokenKey(pin: pin, config: config)    // ulangan USB yoki BAIK
   bloklaydi. `wrong_pin` kelsa (`triesLeft` — qolgan urinishlar, karta yoki
   token aytsa), foydalanuvchidan PIN'ni qayta so'rang.
 
-### Kalitni o'chirish
+### Kalitni o'chirish (2.8.0 dan)
 
 `deleteKey` `getKeys`dagi kalitni telefondagi SDK'dan SDK oynasini ochmasdan
 o'chiradi — `EImzoView` kalitlar ro'yxatidagi o'chirish kabi, lekin
@@ -496,13 +496,13 @@ bilan keladi.
 4. `EImzoConfig(isTestMode:)` o'rniga `EImzoConfig(environment:)` yozing.
 5. Sheet'ni `onSignComplete`da yoping: u «Ilovaga qaytish»dan (yoki taxminan 3 soniyadan) yoki «Tayyor»dan keyin keladi.
 6. App Store Connect → App Privacy: Crash Data va Other Diagnostic Data.
-7. SPM: `from: "2.7.0"`.
+7. SPM: `from: "2.8.0"`.
 
 2.3 dan oldin qo'shilgan ID karta va USB token kalitlarida muddat noto'g'ri saqlangan va JSHSHIR yo'q. To'g'rilash uchun kalitni qayta qo'shish kerak.
 
 ## Foydalanish misoli
 
-Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.7.0"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
+Repodagi `EimzoExample.xcodeproj` (kodi `EimzoExample/` da) — SwiftUI ilova. U SDK'ni SPM orqali shu repodan oladi (`from: "2.8.0"`). Ikkita tugma `EImzoView`ni ochadi: so'rovsiz va `EImzoSignLink.create` bilan yasalgan imzo so'rovi bilan. `eimzo` sxemasi va `onOpenURL` yo'q, SDK `sheet(item:)` bilan ochiladi, muhitni ekrandagi «Test muhiti (dev)» tanlaydi (sukut bo'yicha `.dev`).
 
 Pastdagi tugmalar — Kalitlar API. «Kalitlar ro'yxati» `EImzoAPI.getKeys`ni chaqiradi, qaytgan JSON'ni ko'rsatadi va undagi kalitlardan birini tanlatadi. «Tanlangan kalit bilan imzolash» o'sha imzo so'rovini shu kalit bilan `EImzoAPI.sign` orqali, SDK'ning imzo oynasida imzolaydi. «Oynasiz imzolash» (2.7.0) o'sha so'rovni shu kalit va maydonga yozilgan parol yoki PIN bilan (bo'sh bo'lsa — kalit bilan saqlangani) `EImzoAPI.signDirect` orqali, SDK oynasisiz imzolaydi. «Sayt QR kodini skanerlab imzolash» va QR matni maydoni (2.7.0) — `EImzoAPI.scanAndSign` va `EImzoAPI.signQrCode`. Har birining natija JSON'i ekranda ko'rinadi. Kalitlar API uchun YT ruxsati kerak (yuqoridagi «Kalitlar API»): ruxsat bo'lmasa natija `{"status":"error","code":"api_not_allowed",…}`. Ro'yxat bo'sh bo'lsa, kalitni avval `EImzoView`da qo'shing.
 
